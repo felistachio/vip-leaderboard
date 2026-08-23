@@ -52,10 +52,9 @@ export function ChartWrapper<S extends TimeSeries>({
 		ranked,
 	});
 
-	const [visibleIdx = [], setVisibleIdx] =
-		useState<[from: number, to: number]>();
+	const [visibleIdx, setVisibleIdx] = useState<[from: number, to: number]>();
 	const chartData = useMemo(
-		() => transformedData?.slice(...visibleIdx),
+		() => transformedData?.slice(...(visibleIdx ?? [])),
 		[transformedData, visibleIdx],
 	);
 
@@ -91,6 +90,7 @@ export function ChartWrapper<S extends TimeSeries>({
 			value={{
 				seriesData: data,
 				chartData,
+				visibleIdx,
 				setVisibleIdx,
 				renderReady: useDelay(),
 				colors,

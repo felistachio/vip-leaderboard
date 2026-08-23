@@ -1,11 +1,5 @@
 import { isEqual } from "es-toolkit";
-import {
-	createContext,
-	type Dispatch,
-	type ReactElement,
-	type SetStateAction,
-	use,
-} from "react";
+import { createContext, type ReactElement, use } from "react";
 import type { YyyyMm } from "@/utils/time";
 import type { Maybe, State } from "@/utils/types";
 import type { ChartSeries } from "./Chart";
@@ -18,10 +12,10 @@ interface ChartContextValue<S extends TimeSeries = TimeSeries>
 		activeSeries: Maybe<string>;
 		hoveredPoint: Maybe<InteractivePoint>;
 		enableHover: boolean;
+		visibleIdx: Maybe<[from: number, to: number]>;
 	}> {
 	seriesData: Maybe<readonly S[]>;
 	chartData: Maybe<readonly ChartSeries[]>;
-	setVisibleIdx: Dispatch<SetStateAction<Maybe<[from: number, to: number]>>>;
 	renderReady: boolean;
 	since: YyyyMm;
 	until: YyyyMm;
