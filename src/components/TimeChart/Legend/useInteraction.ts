@@ -6,7 +6,7 @@ import type { Direction } from "./types";
 
 export function useInteraction(direction: Direction) {
 	const { isDragging } = useDrag();
-	const { activeSeries, setActiveSeries } = useChart();
+	const { activeSeries, setActiveSeries, pinnedIds } = useChart();
 
 	const lastHoveredSeries = useRef<Maybe<string>>(undefined);
 	const entriesRef = useRef<Record<string, HTMLLIElement>>({});
@@ -34,7 +34,8 @@ export function useInteraction(direction: Direction) {
 			onMouseEnter() {
 				if (
 					!isDragging &&
-					(!activeSeries || lastHoveredSeries.current !== seriesId)
+					(!activeSeries || lastHoveredSeries.current !== seriesId) &&
+					(!pinnedIds || pinnedIds.includes(seriesId))
 				) {
 					lastHoveredSeries.current = seriesId;
 					setActiveSeries(seriesId);

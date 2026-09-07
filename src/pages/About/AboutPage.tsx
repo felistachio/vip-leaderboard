@@ -36,7 +36,7 @@ function Content() {
 				</p>
 			</Section>
 
-			<Section title="How &quot;work&quot; is counted">
+			<Section title='How "work" is counted'>
 				<Subsection title="1. Handled reports">
 					<p>Tracked channels:</p>
 					<ul>

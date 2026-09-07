@@ -20,6 +20,7 @@ export type TimeSeries = {
 	id: string;
 	data: readonly TimePoint[];
 };
+export type VisibleIdx = readonly [from: number, to: number];
 
 interface Props<S extends TimeSeries> extends TransformOptions {
 	data: Maybe<readonly S[]>;
@@ -45,14 +46,22 @@ export function ChartWrapper<S extends TimeSeries>({
 	const [hoveredPoint, setHoveredPoint] = useState<InteractivePoint>();
 	const [enableHover, setEnableHover] = useState(true);
 
+	const [pinnedIds, setPinnedIds] = useState<readonly string[]>();
+	const filteredData = useMemo(() => {
+		if (!data || !pinnedIds) {
+			return data;
+		}
+		return data.filter(({ id }) => pinnedIds.includes(id));
+	}, [data, pinnedIds]);
+
 	const xValues = useMemo(() => monthsInRange(since, until), [since, until]);
-	const transformedData = useTransform(data, xValues, {
+	const transformedData = useTransform(filteredData, xValues, {
 		area,
 		cumulative,
 		ranked,
 	});
 
-	const [visibleIdx, setVisibleIdx] = useState<[from: number, to: number]>();
+	const [visibleIdx, setVisibleIdx] = useState<VisibleIdx>();
 	const chartData = useMemo(
 		() => transformedData?.slice(...(visibleIdx ?? [])),
 		[transformedData, visibleIdx],
@@ -89,6 +98,8 @@ export function ChartWrapper<S extends TimeSeries>({
 		<ChartContext
 			value={{
 				seriesData: data,
+				pinnedIds,
+				setPinnedIds,
 				chartData,
 				visibleIdx,
 				setVisibleIdx,

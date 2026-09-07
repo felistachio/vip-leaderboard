@@ -16,4 +16,7 @@ export type Direction = "horizontal" | "vertical";
 export type LegendProps<S extends TimeSeries> = {
 	Entry: FC<LegendEntryProps<S>>;
 	className?: string;
+	entriesGap?: Partial<EntriesGap>;
 } & OneOf<Record<Direction, true>>;
+
+export type EntriesGap = { min: number; max: number };

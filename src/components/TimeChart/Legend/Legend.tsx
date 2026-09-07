@@ -5,22 +5,34 @@ import { useChart } from "../chartContext";
 import styles from "../TimeChart.module.css";
 import type { LegendProps } from "./types";
 import { useInteraction } from "./useInteraction";
-import { type EntriesGap, useVirtualization } from "./useVirtualization";
+import { useLayout } from "./useLayout";
+import { useVirtualization } from "./useVirtualization";
 
 const cx = classNames.bind(styles);
 
 export function Legend<S extends TimeSeries>({
+	entries,
+	...props
+}: LegendProps<S> & { entries?: readonly S[] }) {
+	if (!entries) {
+		return <VirtualizedLegend {...props} />;
+	}
+	return <NonVirtualizedLegend {...props} entries={entries} />;
+}
+
+function VirtualizedLegend<S extends TimeSeries>({
 	Entry,
 	vertical,
 	entriesGap,
 	className,
-}: LegendProps<S> & { entriesGap?: Partial<EntriesGap> }) {
+}: LegendProps<S>) {
 	const direction = vertical ? "vertical" : "horizontal";
 	const { renderReady, seriesData, colors } = useChart<S>();
 
 	const { onKeyDown, entry } = useInteraction(direction);
-	const { legendStyle, legendRef, onScroll, entryRef, onEntryFocus } =
-		useVirtualization(direction, entriesGap);
+	const layout = useLayout(direction, entriesGap);
+	const { legendStyle, legendRef, entryRef } = layout;
+	const { onScroll, onEntryFocus } = useVirtualization(direction, layout);
 
 	return (
 		<ol
@@ -55,6 +67,47 @@ export function Legend<S extends TimeSeries>({
 			) : (
 				<LoadingSpinner size={36} />
 			)}
+		</ol>
+	);
+}
+
+function NonVirtualizedLegend<S extends TimeSeries>({
+	entries,
+	Entry,
+	vertical,
+	entriesGap,
+	className,
+}: LegendProps<S> & { entries: readonly S[] }) {
+	const direction = vertical ? "vertical" : "horizontal";
+	const { colors } = useChart<S>();
+
+	const { onKeyDown, entry } = useInteraction(direction);
+	const { legendStyle, legendRef, entryRef } = useLayout(direction, entriesGap);
+
+	return (
+		<ol
+			style={legendStyle}
+			ref={legendRef}
+			className={cx("legend", direction, className)}
+			onKeyDown={onKeyDown}
+			tabIndex={-1}
+		>
+			{entries.map((series, i) => {
+				const { ref, ...eventHandlers } = entry(series.id);
+				return (
+					<Entry
+						key={series.id}
+						series={series}
+						seriesIndex={i}
+						seriesColor={colors[i % colors.length]!}
+						ref={(e) => {
+							entryRef(e);
+							ref(e);
+						}}
+						{...eventHandlers}
+					/>
+				);
+			})}
 		</ol>
 	);
 }

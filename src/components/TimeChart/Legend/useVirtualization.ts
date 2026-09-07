@@ -5,32 +5,24 @@ import {
 	useLayoutEffect,
 	useMemo,
 	useRef,
-	useState,
 } from "react";
-import type { Maybe } from "@/utils/types";
 import { useChart } from "../chartContext";
 import type { Direction } from "./types";
-
-export type EntriesGap = { min: number; max: number };
+import type { useLayout } from "./useLayout";
 
 export function useVirtualization(
 	direction: Direction,
-	{ min: minGap = 0, max: maxGap }: Partial<EntriesGap> = {},
+	{ legendRef, entrySize, gap, visibleCount }: ReturnType<typeof useLayout>,
 ) {
-	const chartContext = useChart();
-	const { colors, activeSeries, seriesData } = chartContext;
-	const maxVisibleCount = colors.length;
-	const defaultVisibleIdx = useMemo<[number, number]>(
-		() => [0, maxVisibleCount],
-		[maxVisibleCount],
-	);
 	const {
-		visibleIdx: [visibleFrom, visibleTo] = defaultVisibleIdx,
+		visibleIdx: [visibleFrom, visibleTo] = [0, visibleCount],
 		setVisibleIdx,
-	} = chartContext;
+		activeSeries,
+		seriesData,
+	} = useChart();
 	const setVisibleFrom = useCallback(
 		(from: number) =>
-			setVisibleIdx((current = defaultVisibleIdx) => {
+			setVisibleIdx((current = [0, visibleCount]) => {
 				const [currentFrom, currentTo] = current;
 				if (from === currentFrom) {
 					return current;
@@ -38,65 +30,20 @@ export function useVirtualization(
 				const currentCount = currentTo - currentFrom;
 				return [from, from + currentCount];
 			}),
-		[setVisibleIdx, defaultVisibleIdx],
+		[setVisibleIdx, visibleCount],
 	);
-	const setVisibleCount = useCallback(
-		(count: number) =>
-			setVisibleIdx((current = defaultVisibleIdx) => {
-				const [currentFrom, currentTo] = current;
-				const currentCount = currentTo - currentFrom;
-				if (count === currentCount) {
-					return current;
-				}
-				return [currentFrom, currentFrom + count];
-			}),
-		[setVisibleIdx, defaultVisibleIdx],
-	);
-
-	const [entrySize, setEntrySize] = useState<Maybe<number>>();
-	const maxSize =
-		entrySize && maxGap
-			? entrySize * maxVisibleCount + maxGap * (maxVisibleCount - 1)
-			: undefined;
-
-	const [gap, setGap] = useState(minGap);
-	const legendRef = useRef<HTMLOListElement>(null);
 	useEffect(() => {
-		const legend = legendRef.current;
-		if (!legend || !entrySize) {
+		if (!seriesData) {
 			return;
 		}
-
-		const observer = new ResizeObserver((entries) => {
-			const rect = entries[0]?.contentRect;
-			if (!rect) {
-				return;
+		setVisibleIdx((current = [0, visibleCount]) => {
+			const [currentFrom, currentTo] = current;
+			if (currentFrom === 0 && currentTo === visibleCount) {
+				return current;
 			}
-			const containerSize = direction === "vertical" ? rect.height : rect.width;
-
-			const visibleCount = Math.min(
-				Math.floor((containerSize + minGap) / (entrySize + minGap)),
-				maxVisibleCount,
-			);
-			const gap =
-				visibleCount > 1
-					? Math.max(
-							(containerSize - entrySize * visibleCount) / (visibleCount - 1),
-							minGap,
-						)
-					: 0;
-
-			setVisibleCount(visibleCount);
-			setGap(
-				visibleCount === maxVisibleCount && maxGap
-					? Math.min(gap, maxGap)
-					: gap,
-			);
+			return [currentFrom, currentFrom + visibleCount];
 		});
-
-		observer.observe(legend);
-		return () => observer.disconnect();
-	}, [setVisibleCount, maxVisibleCount, direction, minGap, maxGap, entrySize]);
+	}, [visibleCount, seriesData, setVisibleIdx]);
 
 	const entryIndexMap = useMemo(() => {
 		if (!seriesData) {
@@ -128,6 +75,7 @@ export function useVirtualization(
 
 	const ignoreScroll = useRef(false);
 	const prevFromIdx = useRef(0);
+	// biome-ignore lint/correctness/useExhaustiveDependencies: legendRef
 	useLayoutEffect(() => {
 		const legend = legendRef.current;
 		if (!legend || !entrySize || !seriesData) {
@@ -150,20 +98,6 @@ export function useVirtualization(
 	}, [setVisibleFrom, seriesData, entrySize, direction, gap]);
 
 	return {
-		legendRef,
-		entryRef(entry: HTMLLIElement | null) {
-			if (entry && !entrySize) {
-				const rect = entry.getBoundingClientRect();
-				const entrySize = direction === "vertical" ? rect.height : rect.width;
-				setEntrySize(entrySize);
-			}
-		},
-		legendStyle: {
-			gap,
-			...(direction === "vertical"
-				? { maxHeight: maxSize }
-				: { maxWidth: maxSize }),
-		},
 		onScroll({ currentTarget }: UIEvent) {
 			if (ignoreScroll.current || !entrySize) {
 				return;

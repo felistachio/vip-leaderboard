@@ -3,16 +3,17 @@ import { createContext, type ReactElement, use } from "react";
 import type { YyyyMm } from "@/utils/time";
 import type { Maybe, State } from "@/utils/types";
 import type { ChartSeries } from "./Chart";
-import type { TimeSeries } from "./ChartWrapper";
+import type { TimeSeries, VisibleIdx } from "./ChartWrapper";
 import type { InteractivePoint } from "./layers/Interaction";
 import type { PointTooltipProps } from "./layers/Points";
 
 interface ChartContextValue<S extends TimeSeries = TimeSeries>
 	extends State<{
 		activeSeries: Maybe<string>;
+		pinnedIds: Maybe<readonly string[]>;
 		hoveredPoint: Maybe<InteractivePoint>;
 		enableHover: boolean;
-		visibleIdx: Maybe<[from: number, to: number]>;
+		visibleIdx: Maybe<VisibleIdx>;
 	}> {
 	seriesData: Maybe<readonly S[]>;
 	chartData: Maybe<readonly ChartSeries[]>;

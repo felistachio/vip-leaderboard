@@ -10,8 +10,13 @@ import { LegendEntry } from "./LegendEntry";
 const cx = classNames.bind(styles);
 
 export function SidePanel() {
-	const { seriesData, renderReady, setActiveSeries, setEnableHover } =
-		useChart<UserMonthlyCount>();
+	const {
+		seriesData,
+		renderReady,
+		setActiveSeries,
+		setEnableHover,
+		pinnedIds,
+	} = useChart<UserMonthlyCount>();
 
 	const [legendWidth, setLegendWidth] = useState(164);
 	const resizeWidth = useCallback((delta: number) => {
@@ -68,6 +73,7 @@ export function SidePanel() {
 				<div className={cx("legend-container")}>
 					<TimeChart.Legend
 						vertical
+						entries={pinnedIds ? seriesData : undefined}
 						Entry={LegendEntry}
 						entriesGap={{ min: 24, max: 64 }}
 						className={cx("legend")}

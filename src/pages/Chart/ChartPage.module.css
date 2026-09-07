@@ -76,6 +76,31 @@ body:has(.chart-page) {
 				padding: var(--box-shadow-size) var(--legend-padding);
 				margin: var(--legend-padding) 0;
 				overflow-x: hidden;
+
+				.info-box {
+					position: relative;
+					.pin-icon {
+						position: absolute;
+						top: 0;
+						right: 0;
+						transform: rotate(45deg);
+						cursor: pointer;
+
+						color: var(--text-tertiary);
+						&:hover {
+							color: var(--text-secondary);
+						}
+						&:active {
+							color: var(--text-primary);
+						}
+						&.pinned {
+							color: var(--accent);
+						}
+					}
+					&:not(:hover) .pin-icon:not(.pinned) {
+						display: none;
+					}
+				}
 			}
 		}
 
