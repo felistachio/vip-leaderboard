@@ -88,8 +88,8 @@ function Content() {
 						</li>
 					</ul>
 					<p>
-						Each VIP earns 1 point for each ban/ban proposal. Batch bans count multiple
-						times, once for each recipient.
+						Each VIP earns 1 point for each ban/ban proposal. Batch bans count
+						multiple times, once for each recipient.
 					</p>
 					<p>
 						Any other VIP who reacts to a ban message with ✅/🔨/👍/
