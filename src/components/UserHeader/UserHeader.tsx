@@ -24,6 +24,7 @@ export function UserHeader({ name, avatarUrl, color, className }: Props) {
 					}}
 					className={cx("avatar")}
 					alt={`${name}'s avatar`}
+					loading="lazy"
 				/>
 			)}
 			<div style={color ? { color } : undefined} className={cx("name")}>
