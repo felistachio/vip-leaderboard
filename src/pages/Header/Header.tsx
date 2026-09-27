@@ -89,7 +89,7 @@ export function Header({ position = "sticky", containerRef }: Props) {
 			<div>
 				<ZackToggle />
 				<a
-					href="https://github.com/felixfourcolor/vip-leaderboard"
+					href="https://github.com/felistachio/vip-leaderboard"
 					target="_blank"
 					rel="noopener noreferrer"
 				>

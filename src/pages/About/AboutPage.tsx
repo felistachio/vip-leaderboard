@@ -139,7 +139,7 @@ function Content() {
 					</p>
 					<p>
 						If you are curious, the entire scoring logic is in{" "}
-						<a href="https://github.com/FelixFourcolor/vip-leaderboard/blob/main/loader/scoring.ts">
+						<a href="https://github.com/felistachio/vip-leaderboard/blob/main/loader/scoring.ts">
 							/loader/scoring.ts
 						</a>
 						.
