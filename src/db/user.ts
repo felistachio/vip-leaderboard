@@ -20,15 +20,15 @@ export function getUser(
 }
 
 interface UserActivity {
-	lastActiveDate: Date;
-	firstActiveDate: Date;
+	lastActiveDate: number;
+	firstActiveDate: number;
 }
 export const userSortBy =
 	<U extends UserActivity>(getValue: (user: U) => number) =>
 	(a: U, b: U) =>
 		getValue(b) - getValue(a) ||
-		b.lastActiveDate.valueOf() - a.lastActiveDate.valueOf() ||
-		b.firstActiveDate.valueOf() - a.firstActiveDate.valueOf();
+		b.lastActiveDate - a.lastActiveDate ||
+		b.firstActiveDate - a.firstActiveDate;
 
 export interface UserStatsParams {
 	since?: YyyyMm;
@@ -78,10 +78,12 @@ export function getUserStats(
 
 		const firstActiveDate = rows
 			.map((r) => r.minDate!)
-			.reduce((min, d) => (d < min ? d : min));
+			.reduce((min, d) => (d < min ? d : min))
+			.getTime();
 		const lastActiveDate = rows
 			.map((r) => r.maxDate!)
-			.reduce((max, d) => (d > max ? d : max));
+			.reduce((max, d) => (d > max ? d : max))
+			.getTime();
 
 		return {
 			id,
@@ -140,11 +142,13 @@ export function getUserMonthlyCount(
 
 		const firstActiveDate = rows
 			.map((r) => r.minDate!)
-			.reduce((min, d) => (d < min ? d : min));
+			.reduce((min, d) => (d < min ? d : min))
+			.getTime();
 
 		const lastActiveDate = rows
 			.map((r) => r.maxDate!)
-			.reduce((max, d) => (d > max ? d : max));
+			.reduce((max, d) => (d > max ? d : max))
+			.getTime();
 
 		return {
 			id,
