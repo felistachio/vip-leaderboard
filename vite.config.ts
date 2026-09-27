@@ -8,7 +8,7 @@ import { defineConfig, type Plugin } from "vite";
 import { getActivityStats } from "./src/db/activity";
 import { getFirstDate, getLastDate } from "./src/db/time";
 import { getUser, getUserStats } from "./src/db/user";
-import { toYyyyMm, yyyyMmOffset } from "./src/utils/time";
+import { monthsInRange, toYyyyMm, yyyyMmOffset } from "./src/utils/time";
 
 const SQL_WASM = {
 	origin: res("node_modules/sql.js/dist/sql-wasm.wasm"),
@@ -49,22 +49,30 @@ function dbBundler(): Plugin {
 
 			const firstDate = getFirstDate(db);
 			const lastDate = getLastDate(db);
-			const zack = getUser(db, "zackwb");
 
+			const firstMonth = toYyyyMm(firstDate);
 			const lastMonth = toYyyyMm(lastDate);
+			const allMonths = monthsInRange(firstMonth, lastMonth);
 			const twoYearsAgo = yyyyMmOffset(lastMonth, { years: -2, months: 1 });
 			const defaultTimeRange = { since: twoYearsAgo, until: lastMonth };
 
 			const defaultActivityStats = getActivityStats(db, defaultTimeRange);
 			const defaultUserStats = getUserStats(db, defaultTimeRange);
+			const zack = getUser(db, "zackwb");
 
 			return `
-					export const FIRST_DATE = new Date(${firstDate.getTime()})
-					export const LAST_DATE = new Date(${lastDate.getTime()})
-					export const ZACK = ${JSON.stringify(zack)}
+					export const LAST_UPDATED = new Date(${lastDate.getTime()})
+
+					export const FIRST_MONTH = ${JSON.stringify(firstMonth)}
+					export const LAST_MONTH = ${JSON.stringify(lastMonth)}
+					export const ALL_MONTHS = ${JSON.stringify(allMonths)}
+					export const TWO_YEARS_AGO = ${JSON.stringify(twoYearsAgo)}
+					export const DEFAULT_TIME_RANGE = ${JSON.stringify(defaultTimeRange)}
 
 					export const DEFAULT_ACTIVITY_STATS = ${JSON.stringify(defaultActivityStats)}
 					export const DEFAULT_USER_STATS = ${JSON.stringify(defaultUserStats)}
+					export const ZACK = ${JSON.stringify(zack)}
+
 				`;
 		},
 	};

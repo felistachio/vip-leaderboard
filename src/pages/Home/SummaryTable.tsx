@@ -1,3 +1,4 @@
+import { FIRST_MONTH, LAST_MONTH, TWO_YEARS_AGO } from "virtual:db";
 import classNames from "classnames/bind";
 import { useMemo } from "react";
 import { DataBarTable } from "@/components/DataBarTable";
@@ -7,7 +8,6 @@ import {
 	activityIcons,
 	activityLabels,
 } from "@/db/activity";
-import { FIRST_MONTH, LAST_MONTH, TWO_YEARS_AGO } from "@/db/constants";
 import { useHomeControls } from "./HomeControls";
 import styles from "./HomePage.module.css";
 

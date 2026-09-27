@@ -1,10 +1,15 @@
+import {
+	ALL_MONTHS,
+	DEFAULT_TIME_RANGE,
+	FIRST_MONTH,
+	LAST_MONTH,
+} from "virtual:db";
 import classNames from "classnames/bind";
 import { isEqual, mapValues } from "es-toolkit";
 import { useCallback, useId, useMemo, useState } from "react";
 import { Button } from "@/components/Button";
 import { PopupMenu, usePopupMenu } from "@/components/PopupMenu";
 import { RangeSlider } from "@/components/RangeSlider";
-import { ALL_MONTHS, FIRST_MONTH, LAST_MONTH, TWO_YEARS_AGO } from "@/db/constants";
 import { useIsTouchDevice } from "@/hooks/useIsTouchDevice";
 import { type RankingOptions, Route } from "@/routes/index";
 import { keys, pick } from "@/utils/object";
@@ -97,8 +102,7 @@ export function HomeControls() {
 }
 
 const defaultOptions = {
-	since: TWO_YEARS_AGO,
-	until: LAST_MONTH,
+	...DEFAULT_TIME_RANGE,
 	sortBy: "total",
 } satisfies Required<RankingOptions>;
 

@@ -1,3 +1,4 @@
+import { ALL_MONTHS, DEFAULT_TIME_RANGE } from "virtual:db";
 import classNames from "classnames/bind";
 import { isEqual, mapValues } from "es-toolkit";
 import { useCallback, useEffect, useMemo } from "react";
@@ -6,7 +7,6 @@ import { PopupMenu } from "@/components/PopupMenu";
 import { RangeSlider } from "@/components/RangeSlider";
 import { useChartZoom } from "@/components/TimeChart";
 import { activityIcons, activityLabels, activityTypes } from "@/db/activity";
-import { ALL_MONTHS, LAST_MONTH, TWO_YEARS_AGO } from "@/db/constants";
 import { type ChartOptions, Route } from "@/routes/chart";
 import { keys, pick } from "@/utils/object";
 import type { YyyyMm } from "@/utils/time";
@@ -115,8 +115,7 @@ export function ChartControls() {
 }
 
 const defaultOptions = {
-	since: TWO_YEARS_AGO,
-	until: LAST_MONTH,
+	...DEFAULT_TIME_RANGE,
 	cumulative: false,
 	area: false,
 	ranked: false,

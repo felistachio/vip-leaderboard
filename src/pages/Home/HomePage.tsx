@@ -1,9 +1,12 @@
-import { DEFAULT_ACTIVITY_STATS, DEFAULT_USER_STATS } from "virtual:db";
+import {
+	DEFAULT_ACTIVITY_STATS,
+	DEFAULT_TIME_RANGE,
+	DEFAULT_USER_STATS,
+} from "virtual:db";
 import classNames from "classnames/bind";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { getActivityStats } from "@/db/activity";
-import { LAST_MONTH, TWO_YEARS_AGO } from "@/db/constants";
 import { loadDB } from "@/db/loader";
 import { getUserStats, type UserStats, userSortBy } from "@/db/user";
 import { useDelay } from "@/hooks/useDelay";
@@ -18,7 +21,8 @@ const cx = classNames.bind(styles);
 
 export function HomePage() {
 	const [{ until, since, sortBy }] = useHomeControls();
-	const isDefaultRange = since === TWO_YEARS_AGO && until === LAST_MONTH;
+	const isDefaultRange =
+		since === DEFAULT_TIME_RANGE.since && until === DEFAULT_TIME_RANGE.until;
 
 	const [activityStats, setActivityStats] = useState(
 		isDefaultRange ? DEFAULT_ACTIVITY_STATS : undefined,
