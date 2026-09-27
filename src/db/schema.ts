@@ -4,7 +4,7 @@ export const user = sqliteTable("user", {
 	id: text("id").primaryKey(),
 	name: text("name").notNull(),
 	avatarUrl: text("avatar_url").notNull(),
-	color: text("color"),
+	color: text("color").notNull(),
 });
 
 export const activity = sqliteTable("activity", {

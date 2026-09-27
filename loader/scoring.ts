@@ -1,8 +1,8 @@
-import type { ActivityData, UserData } from "./data-save";
+import { type ActivityData, EXCLUDED_COLORS, type UserData } from "./data-save";
 import type { Channel, Message, User } from "./types";
 
 export function countActivities(channels: Channel[]) {
-	const usersData: (UserData & { date: Date })[] = [];
+	const usersData: (UserData & { discoverTime: number })[] = [];
 	const activitiesMap = new Map<string, ActivityData>();
 
 	const registerUser =
@@ -14,12 +14,18 @@ export function countActivities(channels: Channel[]) {
 				"https://cdn.discordapp.com/".length,
 				avatarParamIndex === -1 ? undefined : avatarParamIndex,
 			);
+			// Users whose color is excluded don't count, but fetching color is unreliable
+			// (sometimes color is null when it shouldn't). So:
+			// 1) During discovery phase, save all users. Convert null color to one of the excluded.
+			// 2) Sort user by discover time
+			// 3) Insert all user instances to DB, on conflict, update if the new color is not excluded.
+			// 4) Delete + cascade all users whose color is excluded.
 			usersData.push({
 				id,
 				name: nickname,
 				avatarUrl,
-				color,
-				date: new Date(timestamp),
+				color: color ?? EXCLUDED_COLORS[0],
+				discoverTime: new Date(timestamp).getTime(),
 			});
 			return id;
 		};
@@ -156,7 +162,7 @@ export function countActivities(channels: Channel[]) {
 		}
 	});
 	return {
-		users: usersData.sort((u1, u2) => u1.date.valueOf() - u2.date.valueOf()),
+		users: usersData.sort((u1, u2) => u1.discoverTime - u2.discoverTime),
 		activities: Array.from(activitiesMap.values()),
 	};
 }
