@@ -12,7 +12,7 @@ type RangeSliderProps<Value> = {
 	domain: readonly Value[];
 	selected: Pair<Value>;
 	onChange: Dispatch<Pair<Value>>;
-	debounce?: number | false;
+	debounce?: number;
 	className?: string;
 	minDistance?: number;
 	maxDistance?: number;
@@ -22,7 +22,7 @@ export function RangeSlider<Value>({
 	domain,
 	selected: [selectedFrom, selectedTo],
 	onChange,
-	debounce: debounceMs = 64,
+	debounce: debounceMs,
 	minDistance = 0,
 	maxDistance = domain.length - 1,
 	className,
