@@ -20,9 +20,7 @@ export function ZackToggle() {
 			value={isZack}
 			onChange={setIsZack}
 			customStyles={{
-				container: {
-					backgroundColor: isZack ? ZACK.color : undefined,
-				},
+				container: { backgroundColor: isZack ? ZACK.color! : undefined },
 				slider: {
 					backgroundImage: isZack
 						? `url("${zackAvatarUrl}")`

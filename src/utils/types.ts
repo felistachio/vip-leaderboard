@@ -8,7 +8,7 @@ export type State<
 > = {
 	[K in keyof S]: S[K];
 } & {
-	[K in keyof S as `set${Capitalize<K>}`]: Dispatch<
+	[K in string & keyof S as `set${Capitalize<K>}`]: Dispatch<
 		S[K] | (opt["action"] extends true ? (prev: S[K]) => S[K] : never)
 	>;
 };

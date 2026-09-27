@@ -4,7 +4,7 @@ declare module "virtual:db" {
 
 	export const FIRST_DATE: Date;
 	export const LAST_DATE: Date;
-	export const ZACK: User;
+	export const ZACK: NonNullable<User>;
 
 	export const DEFAULT_ACTIVITY_STATS: ActivityStats[];
 	export const DEFAULT_USER_STATS: UserStats[];
