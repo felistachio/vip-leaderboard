@@ -6,7 +6,7 @@ import { PopupMenu } from "@/components/PopupMenu";
 import { RangeSlider } from "@/components/RangeSlider";
 import { useChartZoom } from "@/components/TimeChart";
 import { activityIcons, activityLabels, activityTypes } from "@/db/activity";
-import { ALL_MONTHS, LAST_MONTH, TWO_YEARS_AGO } from "@/db/time";
+import { ALL_MONTHS, LAST_MONTH, TWO_YEARS_AGO } from "@/db/constants";
 import { type ChartOptions, Route } from "@/routes/chart";
 import { keys, pick } from "@/utils/object";
 import type { YyyyMm } from "@/utils/time";

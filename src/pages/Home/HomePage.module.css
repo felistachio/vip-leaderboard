@@ -277,6 +277,9 @@
 					}
 					color: var(--text-secondary);
 				}
+				&.not-available {
+					visibility: hidden;
+				}
 			}
 		}
 	}

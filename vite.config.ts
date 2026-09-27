@@ -1,10 +1,14 @@
 import { copyFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { DatabaseSync } from "node:sqlite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
+import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
 import { defineConfig, type Plugin } from "vite";
-import type { User } from "./loader/types";
+import { getActivityStats } from "./src/db/activity";
+import { getFirstDate, getLastDate } from "./src/db/time";
+import { getUser, getUserStats } from "./src/db/user";
+import { toYyyyMm, yyyyMmOffset } from "./src/utils/time";
 
 const SQL_WASM = {
 	origin: res("node_modules/sql.js/dist/sql-wasm.wasm"),
@@ -41,31 +45,27 @@ function dbBundler(): Plugin {
 				return;
 			}
 
-			const db = new DatabaseSync(res("public/db.sqlite"));
+			const db = drizzle(new Database(res("public/db.sqlite")));
 
-			const { date: firstTimestamp } = db
-				.prepare("SELECT date FROM activity ORDER BY date ASC LIMIT 1")
-				.get() as { date: number };
+			const firstDate = getFirstDate(db);
+			const lastDate = getLastDate(db);
+			const zack = getUser(db, "zackwb");
 
-			const { date: lastTimestamp } = db
-				.prepare("SELECT date FROM activity ORDER BY date DESC LIMIT 1")
-				.get() as { date: number };
+			const lastMonth = toYyyyMm(lastDate);
+			const twoYearsAgo = yyyyMmOffset(lastMonth, { years: -2, months: 1 });
+			const defaultTimeRange = { since: twoYearsAgo, until: lastMonth };
 
-			const { avatarUrl, color } = db
-				.prepare(
-					`SELECT 
-						avatar_url as avatarUrl,
-						color 
-					FROM user
-					WHERE id = 'zackwb'`,
-				)
-				.get() as Pick<User, "avatarUrl" | "color">;
+			const defaultActivityStats = getActivityStats(db, defaultTimeRange);
+			const defaultUserStats = getUserStats(db, defaultTimeRange);
 
-			db.close();
+			return `
+					export const FIRST_DATE = new Date(${firstDate.getTime()})
+					export const LAST_DATE = new Date(${lastDate.getTime()})
+					export const ZACK = ${JSON.stringify(zack)}
 
-			return `export const FIRST_DATE = new Date(${firstTimestamp * 1000})
-					export const LAST_UPDATE = new Date(${lastTimestamp * 1000});
-					export const ZACK = { avatarUrl: "${avatarUrl}", color: "${color}" };`;
+					export const DEFAULT_ACTIVITY_STATS = ${JSON.stringify(defaultActivityStats)}
+					export const DEFAULT_USER_STATS = ${JSON.stringify(defaultUserStats)}
+				`;
 		},
 	};
 }

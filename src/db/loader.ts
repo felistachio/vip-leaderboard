@@ -2,7 +2,7 @@ import { drizzle } from "drizzle-orm/sql-js";
 import { memoize } from "es-toolkit";
 import initSqlJs from "sql.js";
 
-export const loadDb = memoize(() =>
+export const loadDB = memoize(() =>
 	Promise.all([
 		initSqlJs(),
 		fetch("./db.sqlite")

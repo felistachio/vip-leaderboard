@@ -3,6 +3,7 @@ import classNames from "classnames/bind";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { TimeChart } from "@/components/TimeChart";
 import { activityLabels } from "@/db/activity";
+import { loadDB } from "@/db/loader";
 import { getUserMonthlyCount, type UserMonthlyCount } from "@/db/user";
 import { useWindowSize } from "@/hooks/useWindowSize";
 import { Header } from "../Header";
@@ -19,7 +20,9 @@ export function ChartPage() {
 
 	const [data, setData] = useState<UserMonthlyCount[]>();
 	useEffect(() => {
-		getUserMonthlyCount({ since, until, types }).then(setData);
+		loadDB()
+			.then((db) => getUserMonthlyCount(db, { since, until, types }))
+			.then(setData);
 	}, [since, until, types]);
 
 	const navigate = useNavigate();

@@ -10,10 +10,10 @@ import styles from "./HomePage.module.css";
 const cx = classNames.bind(styles);
 
 interface Ranking extends UserStats {
-	rankChange: number;
+	rankChange?: number;
 }
 
-export function RankingTable({ data }: { data: Ranking[] }) {
+export function RankingTable({ data }: { data: readonly Ranking[] }) {
 	const [{ sortBy }, setOptions] = useHomeControls();
 	const isLargeScreen = useWindowSize({ minWidth: 501 });
 
@@ -30,8 +30,9 @@ export function RankingTable({ data }: { data: Ranking[] }) {
 							{isLargeScreen && (
 								<span
 									className={cx("rank-change", {
-										positive: rankChange > 0,
-										negative: rankChange < 0,
+										positive: (rankChange ?? 0) > 0,
+										negative: (rankChange ?? 0) < 0,
+										"not-available": rankChange == null,
 									})}
 									aria-label={
 										!rankChange

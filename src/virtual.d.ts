@@ -1,5 +1,11 @@
 declare module "virtual:db" {
-	export const FIRST_DATE: DATE;
-	export const LAST_UPDATE: Date;
-	export const ZACK: { color: string; avatarUrl: string };
+	import type { ActivityStats } from "@/db/activity";
+	import type { User, UserStats } from "@/db/user";
+
+	export const FIRST_DATE: Date;
+	export const LAST_DATE: Date;
+	export const ZACK: User;
+
+	export const DEFAULT_ACTIVITY_STATS: ActivityStats[];
+	export const DEFAULT_USER_STATS: UserStats[];
 }

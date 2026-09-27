@@ -7,13 +7,13 @@ import {
 	activityIcons,
 	activityLabels,
 } from "@/db/activity";
-import { FIRST_MONTH, LAST_MONTH, TWO_YEARS_AGO } from "@/db/time";
+import { FIRST_MONTH, LAST_MONTH, TWO_YEARS_AGO } from "@/db/constants";
 import { useHomeControls } from "./HomeControls";
 import styles from "./HomePage.module.css";
 
 const cx = classNames.bind(styles);
 
-export function SummaryTable({ data }: { data: ActivityStats[] }) {
+export function SummaryTable({ data }: { data: readonly ActivityStats[] }) {
 	const [{ until, since }] = useHomeControls();
 
 	const timePeriod = useMemo(() => {

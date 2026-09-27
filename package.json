@@ -4,11 +4,12 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "vite",
-		"build": "vite build",
-		"tscheck": "tsc --noEmit -p tsconfig.proj.json ; tsc --noEmit -p tsconfig.app.json",
-		"db-reload": "rm public/db.sqlite; drizzle-kit push && tsx --tsconfig tsconfig.proj.json loader/main.ts",
-		"db-update": "tsx --tsconfig tsconfig.proj.json loader/main.ts update"
+		"dev": "VITE_CONFIG_NATIVE_IGNORE_WARNING=true vite --configLoader bundle",
+		"build": "VITE_CONFIG_NATIVE_IGNORE_WARNING=true vite build --configLoader bundle",
+		"preview": "VITE_CONFIG_NATIVE_IGNORE_WARNING=true vite preview --configLoader bundle",
+		"tscheck": "tsc -p tsconfig.server.json ; tsc -p tsconfig.client.json",
+		"db-reload": "rm public/db.sqlite; drizzle-kit push && tsx --tsconfig tsconfig.server.json loader/main.ts",
+		"db-update": "tsx --tsconfig tsconfig.server.json loader/main.ts update"
 	},
 	"dependencies": {
 		"@floating-ui/react": "^0.27.20",

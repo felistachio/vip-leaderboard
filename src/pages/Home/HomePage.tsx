@@ -1,7 +1,9 @@
+import { DEFAULT_ACTIVITY_STATS, DEFAULT_USER_STATS } from "virtual:db";
 import classNames from "classnames/bind";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { type ActivityStats, getActivityStats } from "@/db/activity";
+import { getActivityStats } from "@/db/activity";
+import { loadDB } from "@/db/loader";
 import { getUserStats, type UserStats, userSortBy } from "@/db/user";
 import { useDelay } from "@/hooks/useDelay";
 import { yyyyMmOffset } from "@/utils/time";
@@ -16,24 +18,34 @@ const cx = classNames.bind(styles);
 export function HomePage() {
 	const [{ until, since, sortBy }] = useHomeControls();
 
-	const [activityStats, setActivityStats] = useState<ActivityStats[]>();
+	const [activityStats, setActivityStats] = useState(DEFAULT_ACTIVITY_STATS);
 	useEffect(() => {
-		getActivityStats({ since, until }).then(setActivityStats);
+		loadDB()
+			.then((db) => getActivityStats(db, { since, until }))
+			.then(setActivityStats);
 	}, [since, until]);
 
-	const [users, setUsers] = useState<UserStats[]>();
+	const [users, setUsers] = useState(DEFAULT_USER_STATS);
 	const [usersLastMonth, setUsersLastMonth] = useState<UserStats[]>();
 	useEffect(() => {
-		getUserStats({ since, until }).then(setUsers);
-		getUserStats({
-			since: yyyyMmOffset(since, { months: -1 }),
-			until: yyyyMmOffset(until, { months: -1 }),
-		}).then(setUsersLastMonth);
+		loadDB().then((db) => {
+			setUsers(getUserStats(db, { since, until }));
+			setUsersLastMonth(
+				getUserStats(db, {
+					since: yyyyMmOffset(since, { months: -1 }),
+					until: yyyyMmOffset(until, { months: -1 }),
+				}),
+			);
+		});
 	}, [since, until]);
 
 	const rankings = useMemo(() => {
-		if (!users || !usersLastMonth) {
-			return;
+		const sortedUsers = users
+			.filter((u) => u.data[sortBy])
+			.sort(userSortBy((u) => u.data[sortBy]));
+
+		if (!usersLastMonth) {
+			return sortedUsers;
 		}
 
 		const filteredUsersLastMonth = usersLastMonth.filter((u) => u.data[sortBy]);
@@ -43,13 +55,10 @@ export function HomePage() {
 				.map((u, i) => [u.id, i]),
 		);
 
-		return users
-			.filter((u) => u.data[sortBy])
-			.sort(userSortBy((u) => u.data[sortBy]))
-			.map((u, i) => ({
-				...u,
-				rankChange: (idxLastMonth[u.id] ?? filteredUsersLastMonth.length) - i,
-			}));
+		return sortedUsers.map((u, i) => ({
+			...u,
+			rankChange: (idxLastMonth[u.id] ?? filteredUsersLastMonth.length) - i,
+		}));
 	}, [users, usersLastMonth, sortBy]);
 
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -59,7 +68,7 @@ export function HomePage() {
 			<div className={cx("main-container")} ref={containerRef} tabIndex={-1}>
 				<Header containerRef={containerRef} />
 				<main>
-					{useDelay() && activityStats && rankings ? (
+					{useDelay() ? (
 						<>
 							<SummaryTable data={activityStats} />
 							<RankingTable data={rankings} />

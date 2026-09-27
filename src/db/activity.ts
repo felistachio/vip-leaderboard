@@ -1,10 +1,10 @@
 import { count, eq, gte, lt, sql } from "drizzle-orm";
+import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { and } from "drizzle-orm/sqlite-core/expressions";
 import { groupBy } from "es-toolkit";
 import type { DataRow } from "@/components/DataBarTable";
 import type { TimeSeries } from "@/components/TimeChart";
-import { type YyyyMm, yyyyMmOffset } from "@/utils/time";
-import { loadDb } from "./loader";
+import { type YyyyMm, yyyyMmOffset } from "../utils/time";
 import { activity } from "./schema";
 
 export const activityTypes = activity.type.enumValues;
@@ -37,14 +37,12 @@ type ActivityParams = {
 export interface ActivityStats extends DataRow<"count"> {
 	type: ActivityType | "total";
 }
-export async function getActivityStats({
-	since,
-	until,
-	user,
-}: ActivityParams): Promise<ActivityStats[]> {
+export function getActivityStats(
+	db: BaseSQLiteDatabase<"sync", any>,
+	{ since, until, user }: ActivityParams,
+): ActivityStats[] {
 	// make "until" include the last month
 	until = until ? yyyyMmOffset(until, { months: 1 }) : undefined;
-	const db = await loadDb();
 
 	const rows = db
 		.select({ type: activity.type, count: count() })
@@ -78,14 +76,12 @@ export interface ActivityMonthlyCount extends TimeSeries {
 	type: ActivityType;
 	count: number;
 }
-export async function getActivityMonthlyStats({
-	since,
-	until,
-	user,
-}: ActivityParams): Promise<ActivityMonthlyCount[]> {
+export function getActivityMonthlyStats(
+	db: BaseSQLiteDatabase<"sync", any>,
+	{ since, until, user }: ActivityParams,
+): ActivityMonthlyCount[] {
 	// make "until" include the last month
 	until = until ? yyyyMmOffset(until, { months: 1 }) : undefined;
-	const db = await loadDb();
 
 	const rows = db
 		.select({

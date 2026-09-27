@@ -1,7 +1,21 @@
 {
-	"files": [],
+	"compilerOptions": {
+		"module": "esnext",
+		"target": "ESNext",
+		"moduleResolution": "bundler",
+		"verbatimModuleSyntax": true,
+		"allowSyntheticDefaultImports": true,
+		"skipDefaultLibCheck": true,
+		"noEmit": true,
+		"paths": { "@/*": ["./src/*"] },
+
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		"noUncheckedSideEffectImports": true,
+	},
+	"include": [],
 	"references": [
-		{ "path": "./tsconfig.app.json" },
-		{ "path": "./tsconfig.proj.json" }
-	]
+		{ "path": "./tsconfig.client.json" },
+		{ "path": "./tsconfig.server.json" },
+	],
 }

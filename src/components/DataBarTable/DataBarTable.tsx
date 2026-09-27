@@ -41,7 +41,7 @@ type Props<
 	PK extends PrimaryKey<Row>,
 	Col extends string = Row extends DataRow<infer U> ? U : never,
 > = {
-	rows: Row[];
+	rows: readonly Row[];
 	primaryKey: PK;
 	columns: Columns<Col, Row, "with-header"> | Columns<Col, Row, "no-header">;
 	activeColumn: Col;

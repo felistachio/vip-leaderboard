@@ -1,8 +1,19 @@
-import { FIRST_DATE, LAST_UPDATE } from "virtual:db";
-import { monthsInRange, toYyyyMm, yyyyMmOffset } from "@/utils/time";
+import { asc, desc } from "drizzle-orm";
+import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
+import { activity } from "./schema";
 
-export const FIRST_MONTH = toYyyyMm(FIRST_DATE);
-export const LAST_MONTH = toYyyyMm(LAST_UPDATE);
+export const getFirstDate = (db: BaseSQLiteDatabase<"sync", any>): Date =>
+	db
+		.select({ date: activity.date })
+		.from(activity)
+		.orderBy(asc(activity.date))
+		.limit(1)
+		.get()!.date;
 
-export const TWO_YEARS_AGO = yyyyMmOffset(LAST_MONTH, { years: -2, months: 1 });
-export const ALL_MONTHS = monthsInRange(FIRST_MONTH, LAST_MONTH);
+export const getLastDate = (db: BaseSQLiteDatabase<"sync", any>): Date =>
+	db
+		.select({ date: activity.date })
+		.from(activity)
+		.orderBy(desc(activity.date))
+		.limit(1)
+		.get()!.date;

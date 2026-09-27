@@ -4,7 +4,7 @@ import { useCallback, useId, useMemo, useState } from "react";
 import { Button } from "@/components/Button";
 import { PopupMenu, usePopupMenu } from "@/components/PopupMenu";
 import { RangeSlider } from "@/components/RangeSlider";
-import { ALL_MONTHS, FIRST_MONTH, LAST_MONTH, TWO_YEARS_AGO } from "@/db/time";
+import { ALL_MONTHS, FIRST_MONTH, LAST_MONTH, TWO_YEARS_AGO } from "@/db/constants";
 import { useIsTouchDevice } from "@/hooks/useIsTouchDevice";
 import { type RankingOptions, Route } from "@/routes/index";
 import { keys, pick } from "@/utils/object";

@@ -1,19 +1,21 @@
 import { and, count, eq, gte, inArray, lt, max, min, sql } from "drizzle-orm";
+import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { groupBy } from "es-toolkit";
 import type { DataRow } from "@/components/DataBarTable";
 import type { TimeSeries } from "@/components/TimeChart";
-import { fromEntries, pick, values } from "@/utils/object";
-import { type YyyyMm, yyyyMmOffset } from "@/utils/time";
 import type { Maybe } from "@/utils/types";
+import { fromEntries, pick, values } from "../utils/object";
+import { type YyyyMm, yyyyMmOffset } from "../utils/time";
 import { type ActivityType, activityTypes } from "./activity";
-import { loadDb } from "./loader";
 import { activity, user } from "./schema";
 
 const userFields = pick(user, ["id", "name", "avatarUrl", "color"]);
 
 export type User = typeof user.$inferSelect;
-export async function getUser(userId: string): Promise<Maybe<User>> {
-	const db = await loadDb();
+export function getUser(
+	db: BaseSQLiteDatabase<"sync", any>,
+	userId: string,
+): Maybe<User> {
 	return db.select(userFields).from(user).where(eq(user.id, userId)).get();
 }
 
@@ -36,13 +38,12 @@ export interface UserStats
 	extends User,
 		UserActivity,
 		DataRow<ActivityType | "total"> {}
-export async function getUserStats({
-	since,
-	until,
-}: UserStatsParams): Promise<UserStats[]> {
+export function getUserStats(
+	db: BaseSQLiteDatabase<"sync", any>,
+	{ since, until }: UserStatsParams,
+): UserStats[] {
 	// make "until" include the last month
 	until = until ? yyyyMmOffset(until, { months: 1 }) : undefined;
-	const db = await loadDb();
 
 	const rows = db
 		.select({
@@ -100,14 +101,12 @@ export interface UserMonthlyCountParams extends UserStatsParams {
 export interface UserMonthlyCount extends User, TimeSeries {
 	total: number;
 }
-export async function getUserMonthlyCount({
-	since,
-	until,
-	types,
-}: UserMonthlyCountParams): Promise<UserMonthlyCount[]> {
+export function getUserMonthlyCount(
+	db: BaseSQLiteDatabase<"sync", any>,
+	{ since, until, types }: UserMonthlyCountParams,
+): UserMonthlyCount[] {
 	// make "until" include the last month
 	until = until ? yyyyMmOffset(until, { months: 1 }) : undefined;
-	const db = await loadDb();
 
 	const rows = db
 		.select({
