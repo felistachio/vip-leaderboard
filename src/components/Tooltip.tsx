@@ -6,9 +6,8 @@ import {
 	shift,
 	useFloating,
 } from "@floating-ui/react";
-import type { CSSProperties, JSX, Ref } from "react";
+import { type CSSProperties, type JSX, type Ref, useState } from "react";
 import { createPortal } from "react-dom";
-import { useSyncedState } from "@/hooks/useSyncedState";
 
 type TooltipTriggerProps = {
 	ref: Ref<any>;
@@ -49,11 +48,12 @@ export function Tooltip({
 		whileElementsMounted: autoUpdate,
 	});
 
-	const [isOpen, setIsOpen] = useSyncedState(open ?? false);
+	const [isHovered, setIsHovered] = useState(false);
+	const isOpen = open ?? isHovered;
 
 	const hoverEvents = {
-		onMouseEnter: () => setIsOpen(true),
-		onMouseLeave: () => setIsOpen(false),
+		onMouseEnter: () => setIsHovered(true),
+		onMouseLeave: () => setIsHovered(false),
 	};
 
 	return (
