@@ -1,4 +1,5 @@
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import type { YyyyMm } from "@/utils/time";
 
 export const user = sqliteTable("user", {
 	id: text("id").primaryKey(),
@@ -9,7 +10,7 @@ export const user = sqliteTable("user", {
 
 export const activity = sqliteTable("activity", {
 	id: integer("id").primaryKey({ autoIncrement: true }),
-	date: integer("date", { mode: "timestamp" }).notNull(),
+	month: text("month").$type<YyyyMm>().notNull(),
 	userId: text("user_id")
 		.notNull()
 		.references(() => user.id, { onDelete: "cascade" }),

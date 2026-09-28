@@ -1,3 +1,4 @@
+import { toYyyyMm } from "@/utils/time";
 import { type ActivityData, EXCLUDED_COLORS, type UserData } from "./data-save";
 import type { Channel, Message, User } from "./types";
 
@@ -44,7 +45,7 @@ export function countActivities(channels: Channel[]) {
 				.forEach((userId) =>
 					activitiesMap.set(`${id}-${userId}`, {
 						userId,
-						date,
+						month: toYyyyMm(date),
 						type: "report",
 					}),
 				);
@@ -71,7 +72,7 @@ export function countActivities(channels: Channel[]) {
 
 			recipientIds.forEach((recipientId) =>
 				activitiesMap.set(`${id}-${recipientId}`, {
-					date,
+					month: toYyyyMm(date),
 					userId: getUserId(author),
 					type: "warning",
 				}),
@@ -107,7 +108,7 @@ export function countActivities(channels: Channel[]) {
 								// intentionally not including message ID in the key
 								// because sometimes autobans have duplicate user IDs
 								activitiesMap.set(`${recipientId}-${userId}`, {
-									date,
+									month: toYyyyMm(date),
 									userId,
 									type: "ban",
 								}),
@@ -131,7 +132,7 @@ export function countActivities(channels: Channel[]) {
 
 				recipientIds.forEach((recipientId) =>
 					activitiesMap.set(`${id}-${recipientId}`, {
-						date,
+						month: toYyyyMm(date),
 						userId: authorId,
 						type: "ban",
 					}),
@@ -144,7 +145,7 @@ export function countActivities(channels: Channel[]) {
 					.filter((userId) => userId !== authorId)
 					.forEach((userId) =>
 						activitiesMap.set(`${id}-${userId}`, {
-							date,
+							month: toYyyyMm(date),
 							userId,
 							type: "ban",
 						}),

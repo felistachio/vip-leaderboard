@@ -1,19 +1,20 @@
 import { asc, desc } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
+import type { YyyyMm } from "@/utils/time";
 import { activity } from "./schema";
 
-export const getFirstDate = (db: BaseSQLiteDatabase<"sync", any>): Date =>
+export const getFirstMonth = (db: BaseSQLiteDatabase<"sync", any>): YyyyMm =>
 	db
-		.select({ date: activity.date })
+		.select({ month: activity.month })
 		.from(activity)
-		.orderBy(asc(activity.date))
+		.orderBy(asc(activity.month))
 		.limit(1)
-		.get()!.date;
+		.get()!.month;
 
-export const getLastDate = (db: BaseSQLiteDatabase<"sync", any>): Date =>
+export const getLastMonth = (db: BaseSQLiteDatabase<"sync", any>): YyyyMm =>
 	db
-		.select({ date: activity.date })
+		.select({ month: activity.month })
 		.from(activity)
-		.orderBy(desc(activity.date))
+		.orderBy(desc(activity.month))
 		.limit(1)
-		.get()!.date;
+		.get()!.month;

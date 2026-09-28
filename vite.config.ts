@@ -6,9 +6,9 @@ import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { defineConfig, type Plugin } from "vite";
 import { getActivityStats } from "./src/db/activity";
-import { getFirstDate, getLastDate } from "./src/db/time";
+import { getFirstMonth, getLastMonth } from "./src/db/time";
 import { getUser, getUserStats } from "./src/db/user";
-import { monthsInRange, toYyyyMm, yyyyMmOffset } from "./src/utils/time";
+import { monthsInRange, yyyyMmOffset } from "./src/utils/time";
 
 const SQL_WASM = {
 	origin: res("node_modules/sql.js/dist/sql-wasm.wasm"),
@@ -47,11 +47,8 @@ function dbBundler(): Plugin {
 
 			const db = drizzle(new Database(res("public/db.sqlite")));
 
-			const firstDate = getFirstDate(db);
-			const lastDate = getLastDate(db);
-
-			const firstMonth = toYyyyMm(firstDate);
-			const lastMonth = toYyyyMm(lastDate);
+			const firstMonth = getFirstMonth(db);
+			const lastMonth = getLastMonth(db);
 			const allMonths = monthsInRange(firstMonth, lastMonth);
 			const twoYearsAgo = yyyyMmOffset(lastMonth, { years: -2, months: 1 });
 			const defaultTimeRange = { since: twoYearsAgo, until: lastMonth };
@@ -61,8 +58,6 @@ function dbBundler(): Plugin {
 			const zack = getUser(db, "zackwb");
 
 			return `
-					export const LAST_UPDATED = new Date(${lastDate.getTime()})
-
 					export const FIRST_MONTH = ${JSON.stringify(firstMonth)}
 					export const LAST_MONTH = ${JSON.stringify(lastMonth)}
 					export const ALL_MONTHS = ${JSON.stringify(allMonths)}

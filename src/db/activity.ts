@@ -1,10 +1,10 @@
-import { count, eq, gte, lt, sql } from "drizzle-orm";
+import { count, eq, gte, lte } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { and } from "drizzle-orm/sqlite-core/expressions";
 import { groupBy } from "es-toolkit";
 import type { DataRow } from "@/components/DataBarTable";
 import type { TimeSeries } from "@/components/TimeChart";
-import { type YyyyMm, yyyyMmOffset } from "../utils/time";
+import type { YyyyMm } from "../utils/time";
 import { activity } from "./schema";
 
 export const activityTypes = activity.type.enumValues;
@@ -41,16 +41,13 @@ export function getActivityStats(
 	db: BaseSQLiteDatabase<"sync", any>,
 	{ since, until, user }: ActivityParams,
 ): ActivityStats[] {
-	// make "until" include the last month
-	until = until ? yyyyMmOffset(until, { months: 1 }) : undefined;
-
 	const rows = db
 		.select({ type: activity.type, count: count() })
 		.from(activity)
 		.where(
 			and(
-				since ? gte(activity.date, new Date(since)) : undefined,
-				until ? lt(activity.date, new Date(until)) : undefined,
+				since ? gte(activity.month, since) : undefined,
+				until ? lte(activity.month, until) : undefined,
 				user ? eq(activity.userId, user) : undefined,
 			),
 		)
@@ -80,25 +77,21 @@ export function getActivityMonthlyStats(
 	db: BaseSQLiteDatabase<"sync", any>,
 	{ since, until, user }: ActivityParams,
 ): ActivityMonthlyCount[] {
-	// make "until" include the last month
-	until = until ? yyyyMmOffset(until, { months: 1 }) : undefined;
-
 	const rows = db
 		.select({
 			type: activity.type,
-			// biome-ignore format: one line
-			month: sql<string>`strftime('%Y-%m', ${activity.date}, 'unixepoch')`.as("month"),
-			count: count().as("count"),
+			month: activity.month,
+			count: count(),
 		})
 		.from(activity)
 		.where(
 			and(
-				since ? gte(activity.date, new Date(since)) : undefined,
-				until ? lt(activity.date, new Date(until)) : undefined,
+				since ? gte(activity.month, since) : undefined,
+				until ? lte(activity.month, until) : undefined,
 				user ? eq(activity.userId, user) : undefined,
 			),
 		)
-		.groupBy(activity.type, sql`month`)
+		.groupBy(activity.type, activity.month)
 		.all();
 
 	return Object.entries(groupBy(rows, (r) => r.type))

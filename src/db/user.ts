@@ -1,11 +1,11 @@
-import { and, count, eq, gte, inArray, lt, max, min, sql } from "drizzle-orm";
+import { and, count, eq, gte, inArray, lte, max, min } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { groupBy } from "es-toolkit";
 import type { DataRow } from "@/components/DataBarTable";
 import type { TimeSeries } from "@/components/TimeChart";
 import type { Maybe } from "@/utils/types";
 import { fromEntries, pick, values } from "../utils/object";
-import { type YyyyMm, yyyyMmOffset } from "../utils/time";
+import type { YyyyMm } from "../utils/time";
 import { type ActivityType, activityTypes } from "./activity";
 import { activity, user } from "./schema";
 
@@ -20,15 +20,15 @@ export function getUser(
 }
 
 interface UserActivity {
-	lastActiveDate: number;
-	firstActiveDate: number;
+	lastActiveMonth: YyyyMm;
+	firstActiveMonth: YyyyMm;
 }
 export const userSortBy =
 	<U extends UserActivity>(getValue: (user: U) => number) =>
 	(a: U, b: U) =>
 		getValue(b) - getValue(a) ||
-		b.lastActiveDate - a.lastActiveDate ||
-		b.firstActiveDate - a.firstActiveDate;
+		b.lastActiveMonth.localeCompare(a.lastActiveMonth) ||
+		b.firstActiveMonth.localeCompare(a.firstActiveMonth);
 
 export interface UserStatsParams {
 	since?: YyyyMm;
@@ -42,23 +42,20 @@ export function getUserStats(
 	db: BaseSQLiteDatabase<"sync", any>,
 	{ since, until }: UserStatsParams,
 ): UserStats[] {
-	// make "until" include the last month
-	until = until ? yyyyMmOffset(until, { months: 1 }) : undefined;
-
 	const rows = db
 		.select({
 			...userFields,
-			count: count(activity.date),
+			count: count(activity.month),
 			type: activity.type,
-			minDate: min(activity.date),
-			maxDate: max(activity.date),
+			firstMonth: min(activity.month),
+			lastMonth: max(activity.month),
 		})
 		.from(activity)
 		.innerJoin(user, eq(user.id, activity.userId))
 		.where(
 			and(
-				since ? gte(activity.date, new Date(since)) : undefined,
-				until ? lt(activity.date, new Date(until)) : undefined,
+				since ? gte(activity.month, since) : undefined,
+				until ? lte(activity.month, until) : undefined,
 			),
 		)
 		.groupBy(user.id, activity.type)
@@ -76,14 +73,12 @@ export function getUserStats(
 		const total = values(activitiesCount).reduce((sum, v) => sum + v, 0);
 		const data = { ...activitiesCount, total };
 
-		const firstActiveDate = rows
-			.map((r) => r.minDate!)
-			.reduce((min, d) => (d < min ? d : min))
-			.getTime();
-		const lastActiveDate = rows
-			.map((r) => r.maxDate!)
-			.reduce((max, d) => (d > max ? d : max))
-			.getTime();
+		const firstActiveMonth = rows
+			.map((r) => r.firstMonth!)
+			.reduce((min, d) => (d < min ? d : min));
+		const lastActiveMonth = rows
+			.map((r) => r.lastMonth!)
+			.reduce((max, d) => (d > max ? d : max));
 
 		return {
 			id,
@@ -91,8 +86,8 @@ export function getUserStats(
 			color,
 			avatarUrl,
 			data,
-			lastActiveDate,
-			firstActiveDate,
+			lastActiveMonth,
+			firstActiveMonth,
 		};
 	});
 }
@@ -107,28 +102,24 @@ export function getUserMonthlyCount(
 	db: BaseSQLiteDatabase<"sync", any>,
 	{ since, until, types }: UserMonthlyCountParams,
 ): UserMonthlyCount[] {
-	// make "until" include the last month
-	until = until ? yyyyMmOffset(until, { months: 1 }) : undefined;
-
 	const rows = db
 		.select({
 			...userFields,
-			// biome-ignore format: one line
-			month: sql<string>`strftime('%Y-%m', ${activity.date}, 'unixepoch')`.as("month"),
+			month: activity.month,
 			count: count().as("count"),
-			minDate: min(activity.date),
-			maxDate: max(activity.date),
+			firstMonth: min(activity.month),
+			lastMonth: max(activity.month),
 		})
 		.from(activity)
 		.innerJoin(user, eq(user.id, activity.userId))
 		.where(
 			and(
-				since ? gte(activity.date, new Date(since)) : undefined,
-				until ? lt(activity.date, new Date(until)) : undefined,
+				since ? gte(activity.month, since) : undefined,
+				until ? lte(activity.month, until) : undefined,
 				types?.length ? inArray(activity.type, types) : undefined,
 			),
 		)
-		.groupBy(activity.userId, sql`month`)
+		.groupBy(activity.userId, activity.month)
 		.all();
 
 	const users = Object.entries(groupBy(rows, (r) => r.id)).map(([id, rows]) => {
@@ -140,15 +131,13 @@ export function getUserMonthlyCount(
 			value: r.count,
 		}));
 
-		const firstActiveDate = rows
-			.map((r) => r.minDate!)
-			.reduce((min, d) => (d < min ? d : min))
-			.getTime();
+		const firstActiveMonth = rows
+			.map((r) => r.firstMonth!)
+			.reduce((min, m) => (m < min ? m : min));
 
-		const lastActiveDate = rows
-			.map((r) => r.maxDate!)
-			.reduce((max, d) => (d > max ? d : max))
-			.getTime();
+		const lastActiveMonth = rows
+			.map((r) => r.lastMonth!)
+			.reduce((max, m) => (m > max ? m : max));
 
 		return {
 			id,
@@ -157,8 +146,8 @@ export function getUserMonthlyCount(
 			avatarUrl,
 			total,
 			data,
-			firstActiveDate,
-			lastActiveDate,
+			firstActiveMonth,
+			lastActiveMonth,
 		};
 	});
 

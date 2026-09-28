@@ -1,9 +1,10 @@
-import { LAST_UPDATED } from "virtual:db";
+import { LAST_MONTH } from "virtual:db";
 import { Link } from "@tanstack/react-router";
 import classNames from "classnames/bind";
 import { type CSSProperties, type RefObject, useEffect, useState } from "react";
 import { Tooltip } from "@/components/Tooltip";
 import { useWindowSize } from "@/hooks/useWindowSize";
+import { yyyyMmOffset } from "@/utils/time";
 import styles from "./Header.module.css";
 import { ZackToggle } from "./ZackToggle";
 
@@ -56,7 +57,7 @@ export function Header({ position = "sticky", containerRef }: Props) {
 				<h1>VIP leaderboard</h1>
 				<dl>
 					<dt>Last update</dt>
-					<dd>{LAST_UPDATED.toISOString().slice(0, 10)}</dd>
+					<dd>{`${yyyyMmOffset(LAST_MONTH, { months: 1 })}-01`}</dd>
 				</dl>
 			</div>
 			<nav>

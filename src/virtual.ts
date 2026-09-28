@@ -3,8 +3,6 @@ declare module "virtual:db" {
 	import type { User, UserStats, UserStatsParams } from "@/db/user";
 	import type { YyyyMm } from "@/utils/time";
 
-	export const LAST_UPDATED: Date;
-
 	export const FIRST_MONTH: YyyyMm;
 	export const LAST_MONTH: YyyyMm;
 	export const ALL_MONTHS: readonly YyyyMm[];
