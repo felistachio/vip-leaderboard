@@ -72,7 +72,6 @@ function dbBundler(): Plugin {
 					export const DEFAULT_ACTIVITY_STATS = ${JSON.stringify(defaultActivityStats)}
 					export const DEFAULT_USER_STATS = ${JSON.stringify(defaultUserStats)}
 					export const ZACK = ${JSON.stringify(zack)}
-
 				`;
 		},
 	};
