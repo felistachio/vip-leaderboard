@@ -9,7 +9,6 @@
 	align-items: center;
 	padding: 12px 24px;
 	gap: 32px;
-	border-bottom: 1px solid var(--text-tertiary);
 	background: var(--bg-secondary);
 	user-select: none;
 
@@ -24,6 +23,7 @@
 		&.absolute {
 			position: absolute;
 			width: 100%;
+			border-bottom: 1px solid var(--text-tertiary);
 		}
 		&.floating {
 			&::after {
@@ -35,7 +35,7 @@
 				transition: height 0.3s ease;
 			}
 			&:is(:hover, :has(:focus-visible)) {
-				z-index: 2;
+				z-index: 3;
 				&::after {
 					height: 0;
 				}

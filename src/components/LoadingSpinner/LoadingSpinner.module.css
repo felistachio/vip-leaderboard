@@ -3,10 +3,7 @@
 	width: var(--size);
 	height: var(--size);
 	border-radius: 50%;
-	border-top: var(--thickness) solid var(--text-secondary);
-	[data-is-zack="true"] & {
-		border-top-color: var(--text-tertiary);
-	}
+	border-top: var(--thickness) solid var(--text-tertiary);
 	border-right: var(--thickness) solid transparent;
 	animation: rotation 1.25s linear infinite;
 
