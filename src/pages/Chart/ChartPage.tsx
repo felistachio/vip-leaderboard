@@ -9,14 +9,14 @@ import { useWindowSize } from "@/hooks/useWindowSize";
 import { Header } from "../Header";
 import { ChartControls, useChartControls } from "./ChartControls";
 import styles from "./ChartPage.module.css";
+import { Legend } from "./Legend";
 import { PointTooltip } from "./PointTooltip";
-import { SidePanel } from "./SidePanel";
 
 const cx = classNames.bind(styles);
 
 export function ChartPage() {
 	const [options] = useChartControls();
-	const { since, until, types, ranked, area } = options;
+	const { since, until, types, ranked, area, pins } = options;
 
 	const [data, setData] = useState<UserMonthlyCount[]>();
 	useEffect(() => {
@@ -45,13 +45,15 @@ export function ChartPage() {
 		},
 	});
 
+	const hasPins = pins.length > 0;
 	const title = useMemo(() => {
 		const type = types.map((t) => activityLabels[t]).join(" + ");
 		if (area || !ranked) {
 			return type || "Activities";
 		}
-		return type ? `Rank by ${type.toLowerCase()}` : "Rank";
-	}, [types, area, ranked]);
+		const rank = type ? `Rank by ${type.toLowerCase()}` : "Rank";
+		return hasPins ? `Relative ${rank.toLowerCase()}` : rank;
+	}, [types, area, ranked, hasPins]);
 
 	return (
 		<>
@@ -62,7 +64,7 @@ export function ChartPage() {
 						<legend>chart</legend>
 						<TimeChart.Chart title={title} />
 					</fieldset>
-					<SidePanel />
+					<Legend />
 					<ChartControls />
 				</TimeChart>
 			</main>

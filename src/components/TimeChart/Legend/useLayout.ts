@@ -7,9 +7,7 @@ export function useLayout(
 	direction: Direction,
 	{ min: minGap = 0, max: maxGap }: Partial<EntriesGap> = {},
 ) {
-	const {
-		colors: { length: maxVisibleCount },
-	} = useChart();
+	const { colorsCount: maxVisibleCount } = useChart();
 	const [visibleCount, setVisibleCount] = useState(maxVisibleCount);
 
 	const [entrySize, setEntrySize] = useState<Maybe<number>>();

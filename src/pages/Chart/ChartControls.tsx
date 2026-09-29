@@ -121,6 +121,7 @@ const defaultOptions = {
 	area: false,
 	ranked: false,
 	types: [],
+	pins: [], 
 } satisfies Required<ChartOptions>;
 
 const isDefaultOptions = (options: ChartOptions) =>

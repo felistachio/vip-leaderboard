@@ -30,10 +30,9 @@ type ChartProps = {
 };
 
 export function Chart({ title, className }: ChartProps) {
-	const { renderReady } = useChart();
+	const { renderReady, colorMap } = useChart();
 	const { clipPathId, isInteracting } = useChartZoom();
 	const data = useDataOrdering();
-	const colors = useColors();
 	const { yScale, axisLeft, gridYValues } = useVerticalScale(title);
 	const { xScale, axisBottom, gridXValues } = useHorizontalScale();
 
@@ -46,7 +45,7 @@ export function Chart({ title, className }: ChartProps) {
 				<ResponsiveLine
 					{...DEFAULT_CONFIGS}
 					data={data}
-					colors={colors}
+					colors={({ id }) => colorMap[id]!}
 					gridXValues={gridXValues}
 					axisBottom={axisBottom}
 					xScale={xScale}
@@ -113,24 +112,8 @@ function useDataOrdering(): Maybe<readonly ChartSeries[]> {
 			return chartData;
 		}
 		const [active, others] = partition(chartData, (s) => s.id === activeSeries);
-		return [...others, ...active];
+		return others.concat(active);
 	}, [chartData, activeSeries, stacked]);
-}
-
-function useColors() {
-	const { seriesData, colors } = useChart();
-
-	const colorMapping = useMemo(() => {
-		if (!seriesData) {
-			return {};
-		}
-		return Object.fromEntries(
-			seriesData.map(({ id }, i) => [id, colors[i % colors.length]]),
-		);
-	}, [seriesData, colors]);
-
-	// Cannot use array index because of useDataOrdering
-	return (series: ChartSeries) => colorMapping[series.id]!;
 }
 
 const LABEL_WIDTH = 64; // estimate based on current styles

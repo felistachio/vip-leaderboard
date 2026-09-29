@@ -1,4 +1,4 @@
-import { zip } from "es-toolkit";
+import { partition, zip } from "es-toolkit";
 import { type JSX, type ReactNode, useEffect, useMemo, useState } from "react";
 import { useDelay } from "@/hooks/useDelay";
 import { mapReduce } from "@/utils/array";
@@ -24,6 +24,7 @@ export type VisibleIdx = readonly [from: number, to: number];
 
 interface Props<S extends TimeSeries> extends TransformOptions {
 	data: Maybe<readonly S[]>;
+	pins: readonly string[];
 	since: YyyyMm;
 	until: YyyyMm;
 	colors?: readonly string[];
@@ -33,6 +34,7 @@ interface Props<S extends TimeSeries> extends TransformOptions {
 
 export function ChartWrapper<S extends TimeSeries>({
 	data,
+	pins,
 	since,
 	until,
 	colors = category10,
@@ -46,26 +48,48 @@ export function ChartWrapper<S extends TimeSeries>({
 	const [hoveredPoint, setHoveredPoint] = useState<InteractivePoint>();
 	const [enableHover, setEnableHover] = useState(true);
 
-	const [pinnedIds, setPinnedIds] = useState<readonly string[]>();
-	const filteredData = useMemo(() => {
-		if (!data || !pinnedIds) {
-			return data;
+	const { seriesData, pinnedData } = useMemo(() => {
+		if (!data) {
+			return { seriesData: undefined, pinnedData: undefined };
 		}
-		return data.filter(({ id }) => pinnedIds.includes(id));
-	}, [data, pinnedIds]);
+
+		const rankedData = data.map((series, index) => ({
+			...series,
+			$index: index,
+		}));
+
+		if (!pins.length) {
+			return { seriesData: rankedData, pinnedData: rankedData };
+		}
+
+		const [pinned, unpinned] = partition(rankedData, ({ id }) =>
+			pins.includes(id),
+		);
+		return { seriesData: pinned.concat(unpinned), pinnedData: pinned };
+	}, [data, pins]);
+
+	const colorMap = useMemo(
+		() =>
+			Object.fromEntries(
+				seriesData?.map(({ id }, i) => [id, colors[i % colors.length]!]) ?? [],
+			),
+		[seriesData, colors],
+	);
 
 	const xValues = useMemo(() => monthsInRange(since, until), [since, until]);
-	const transformedData = useTransform(filteredData, xValues, {
+	const transformedData = useTransform(pinnedData, xValues, {
 		area,
 		cumulative,
 		ranked,
 	});
 
 	const [visibleIdx, setVisibleIdx] = useState<VisibleIdx>();
-	const chartData = useMemo(
-		() => transformedData?.slice(...(visibleIdx ?? [])),
-		[transformedData, visibleIdx],
-	);
+	const chartData = useMemo(() => {
+		if (!transformedData || pins.length) {
+			return transformedData;
+		}
+		return transformedData.slice(...(visibleIdx ?? []));
+	}, [transformedData, pins, visibleIdx]);
 
 	const visibleIds = useMemo(
 		() => new Set(chartData?.map((s) => s.id)),
@@ -97,14 +121,14 @@ export function ChartWrapper<S extends TimeSeries>({
 	return (
 		<ChartContext
 			value={{
-				seriesData: data,
-				pinnedIds,
-				setPinnedIds,
+				seriesData,
+				pins,
 				chartData,
 				visibleIdx,
 				setVisibleIdx,
 				renderReady: useDelay(),
-				colors,
+				colorsCount: colors.length,
+				colorMap,
 				since,
 				until,
 				area,

@@ -24,6 +24,7 @@
 		"es-toolkit": "^1.52.0",
 		"react": "^19.3.0",
 		"react-dom": "^19.3.0",
+		"react-flip-toolkit": "^7.2.4",
 		"react-range": "^1.10.0",
 		"sql.js": "^1.14.2"
 	},

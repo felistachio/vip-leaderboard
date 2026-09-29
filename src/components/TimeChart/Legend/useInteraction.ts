@@ -6,7 +6,7 @@ import type { Direction } from "./types";
 
 export function useInteraction(direction: Direction) {
 	const { isDragging } = useDrag();
-	const { activeSeries, setActiveSeries, pinnedIds } = useChart();
+	const { activeSeries, setActiveSeries, isUnpinned } = useChart();
 
 	const lastHoveredSeries = useRef<Maybe<string>>(undefined);
 	const entriesRef = useRef<Record<string, HTMLLIElement>>({});
@@ -23,6 +23,9 @@ export function useInteraction(direction: Direction) {
 				// prevent native keyboard scrolling
 				// because we're manually controlling the scroll to snap to entry
 				e.preventDefault();
+			} else if (e.key === "Escape" && activeSeries) {
+				entriesRef.current[activeSeries]?.blur();
+				setActiveSeries(undefined);
 			}
 		},
 		entry: (seriesId: string) => ({
@@ -35,7 +38,7 @@ export function useInteraction(direction: Direction) {
 				if (
 					!isDragging &&
 					(!activeSeries || lastHoveredSeries.current !== seriesId) &&
-					(!pinnedIds || pinnedIds.includes(seriesId))
+					!isUnpinned(seriesId)
 				) {
 					lastHoveredSeries.current = seriesId;
 					setActiveSeries(seriesId);
@@ -43,12 +46,26 @@ export function useInteraction(direction: Direction) {
 			},
 			onMouseLeave() {
 				setActiveSeries(undefined);
+				entriesRef.current[seriesId]?.blur();
 			},
 			onFocus() {
-				setActiveSeries(seriesId);
+				if (!isUnpinned(seriesId)) {
+					setActiveSeries(seriesId);
+				}
 			},
 			onBlur() {
-				setActiveSeries((c) => (c === seriesId ? undefined : c));
+				setTimeout(
+					// prevent a brief moment when tabbing between entries
+					// where no entry is focused, causing flicker
+					() => {
+						if (
+							!entriesRef.current[seriesId]?.contains(document.activeElement)
+						) {
+							setActiveSeries((c) => (c === seriesId ? undefined : c));
+						}
+					},
+					0,
+				);
 			},
 			onKeyDown({
 				key,

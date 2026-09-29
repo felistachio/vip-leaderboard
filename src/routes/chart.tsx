@@ -5,9 +5,9 @@ import { activityTypes } from "@/db/activity";
 import type { UserMonthlyCountParams } from "@/db/user";
 import { ChartPage } from "@/pages/Chart";
 
-export interface ChartOptions
-	extends UserMonthlyCountParams,
-		TransformOptions {}
+export interface ChartOptions extends UserMonthlyCountParams, TransformOptions {
+	pins?: readonly string[];
+}
 
 export const Route = createFileRoute("/chart")({
 	component: ChartPage,

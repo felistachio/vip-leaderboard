@@ -6,7 +6,6 @@ export const category10 = [
 	"#bcbd22",
 	"#9467bd",
 	"#17becf",
-	"#7f7f7f",
+	"var(--text-secondary)",
 	"#e377c2",
-	"#8c564b",
 ] as const;

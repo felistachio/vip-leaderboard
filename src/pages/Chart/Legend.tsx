@@ -1,22 +1,20 @@
 import classNames from "classnames/bind";
 import { useCallback, useMemo, useState } from "react";
+import { Flipper } from "react-flip-toolkit";
 import { Resizer } from "@/components/Resizer";
 import { SearchBar } from "@/components/SearchBar";
 import { TimeChart, useChart } from "@/components/TimeChart";
 import type { UserMonthlyCount } from "@/db/user";
+import { useChartControls } from "./ChartControls";
 import styles from "./ChartPage.module.css";
 import { LegendEntry } from "./LegendEntry";
 
 const cx = classNames.bind(styles);
 
-export function SidePanel() {
-	const {
-		seriesData,
-		renderReady,
-		setActiveSeries,
-		setEnableHover,
-		pinnedIds,
-	} = useChart<UserMonthlyCount>();
+export function Legend() {
+	const { seriesData, renderReady, setActiveSeries, setEnableHover } =
+		useChart<UserMonthlyCount>();
+	const [{ pins }, setOptions] = useChartControls();
 
 	const [legendWidth, setLegendWidth] = useState(164);
 	const resizeWidth = useCallback((delta: number) => {
@@ -59,26 +57,33 @@ export function SidePanel() {
 						placeholder="Search user.."
 						onChange={(name) => {
 							const userId = suggestionToIdMap?.[name];
-							if (userId) {
-								// momentarily disable hover to avoid conflict
-								setEnableHover(false);
-								setActiveSeries(userId);
-								setTimeout(() => setEnableHover(true), 0);
+							if (!userId) {
+								return;
 							}
+							setOptions({
+								pins: (() => {
+									if (!pins.length || pins.includes(userId)) {
+										return pins;
+									}
+									return pins.concat(userId);
+								})(),
+							});
+							setEnableHover(false);
+							setActiveSeries(userId);
+							setTimeout(() => setEnableHover(true), 0);
 						}}
 						suggestions={searchSuggestions}
 						className={cx("search-bar")}
 					/>
 				)}
-				<div className={cx("legend-container")}>
+				<Flipper flipKey={pins.join()} className={cx("legend-container")}>
 					<TimeChart.Legend
 						vertical
-						entries={pinnedIds ? seriesData : undefined}
 						Entry={LegendEntry}
-						entriesGap={{ min: 24, max: 64 }}
+						entriesGap={{ min: 20, max: 60 }}
 						className={cx("legend")}
 					/>
-				</div>
+				</Flipper>
 			</fieldset>
 			<Resizer left onChange={resizeWidth} className={cx("legend-resizer")} />
 		</>

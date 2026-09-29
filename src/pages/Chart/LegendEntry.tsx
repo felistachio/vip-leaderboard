@@ -1,68 +1,78 @@
 import classNames from "classnames/bind";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
+import { Flipped } from "react-flip-toolkit";
 import { type LegendEntryProps, useChart } from "@/components/TimeChart";
 import { UserHeader } from "@/components/UserHeader";
 import type { UserMonthlyCount } from "@/db/user";
+import { useChartControls } from "./ChartControls";
 import styles from "./ChartPage.module.css";
 
 const cx = classNames.bind(styles);
 
 export function LegendEntry({
-	series: { id, total, ...user },
-	seriesColor,
-	seriesIndex,
+	series: { id, total, $index, ...user },
+	onFocus,
 	...props
 }: LegendEntryProps<UserMonthlyCount>) {
-	const { isHighlighted, pinnedIds, setPinnedIds } = useChart();
-	const rank = seriesIndex + 1;
+	const { isHighlighted, colorMap } = useChart();
+	const [{ pins }, setOptions] = useChartControls();
 
 	const togglePin = () =>
-		setPinnedIds((current) => {
-			const existing = current?.indexOf(id) ?? -1;
-			if (current && existing !== -1) {
-				const result = current.toSpliced(existing, 1);
-				return result.length ? result : undefined;
-			}
-			return current ? [id, ...current] : [id];
+		setOptions({
+			pins: (() => {
+				const existing = pins.indexOf(id) ?? -1;
+				if (pins.length && existing !== -1) {
+					const result = pins.toSpliced(existing, 1);
+					return result.length ? result : undefined;
+				}
+				return pins ? pins.concat(id) : [id];
+			})(),
 		});
-	const isPinned = useMemo(() => pinnedIds?.includes(id), [pinnedIds, id]);
+	const pinned = useMemo(() => pins.includes(id), [pins, id]);
+	const unpinned = pins.length && !pinned;
 
+	const pinRef = useRef<HTMLButtonElement>(null);
 	return (
-		<li
-			tabIndex={0}
-			style={{ ["--series-color" as string]: seriesColor }}
-			className={cx("info-box", { highlighted: isHighlighted(id) })}
-			{...props}
-		>
-			<UserHeader {...user} />
-			<div className={cx("details")}>
-				<span className={cx("rank")} aria-label={`rank ${rank}`}>
-					#{rank}
-				</span>
-				<span aria-label={`total score ${total}`}>{total}</span>
-			</div>
-			<PinIcon
-				className={cx("pin-icon", { pinned: isPinned })}
-				onClick={togglePin}
-			/>
-		</li>
+		<Flipped key={id} flipId={id}>
+			<li
+				tabIndex={!pins.length || pinned ? 0 : -1}
+				style={{ ["--series-color" as string]: colorMap[id] }}
+				className={cx("info-box", { highlighted: isHighlighted(id), unpinned })}
+				onFocus={(e) => {
+					onFocus?.(e);
+					if (unpinned) {
+						pinRef.current?.focus();
+					}
+				}}
+				{...props}
+			>
+				<UserHeader {...user} />
+				<div className={cx("details")}>
+					<span className={cx("rank")} aria-label={`rank ${$index + 1}`}>
+						#{$index + 1}
+					</span>
+					<span aria-label={`total score ${total}`}>{total}</span>
+				</div>
+				<button
+					type="button"
+					className={cx("pin-btn", { pinned })}
+					onClick={togglePin}
+					ref={pinRef}
+				>
+					<PinIcon />
+				</button>
+			</li>
+		</Flipped>
 	);
 }
 
-const PinIcon = ({
-	className,
-	onClick,
-}: {
-	className?: string;
-	onClick?: () => void;
-}) => (
+const PinIcon = () => (
 	<svg
 		aria-hidden
 		viewBox="0 0 24 24"
-		className={className}
 		width="20"
 		height="20"
-		onClick={onClick}
+		style={{ transform: "rotate(45deg)" }}
 	>
 		<path
 			fill="currentColor"

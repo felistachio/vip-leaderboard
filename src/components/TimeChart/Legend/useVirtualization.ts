@@ -19,6 +19,7 @@ export function useVirtualization(
 		setVisibleIdx,
 		activeSeries,
 		seriesData,
+		hasPins,
 	} = useChart();
 	const setVisibleFrom = useCallback(
 		(from: number) =>
@@ -33,7 +34,7 @@ export function useVirtualization(
 		[setVisibleIdx, visibleCount],
 	);
 	useEffect(() => {
-		if (!seriesData) {
+		if (!seriesData || hasPins) {
 			return;
 		}
 		setVisibleIdx((current = [0, visibleCount]) => {
@@ -43,7 +44,7 @@ export function useVirtualization(
 			}
 			return [currentFrom, currentFrom + visibleCount];
 		});
-	}, [visibleCount, seriesData, setVisibleIdx]);
+	}, [visibleCount, seriesData, setVisibleIdx, hasPins]);
 
 	const entryIndexMap = useMemo(() => {
 		if (!seriesData) {
@@ -54,7 +55,7 @@ export function useVirtualization(
 		);
 	}, [seriesData]);
 	useEffect(() => {
-		if (!activeSeries) {
+		if (!activeSeries || hasPins) {
 			return;
 		}
 		const activeIndex = entryIndexMap?.[activeSeries];
@@ -71,14 +72,13 @@ export function useVirtualization(
 			}
 			return [activeIndex, activeIndex + currentTo - currentFrom];
 		});
-	}, [activeSeries, setVisibleIdx, entryIndexMap]);
+	}, [activeSeries, setVisibleIdx, entryIndexMap, hasPins]);
 
 	const ignoreScroll = useRef(false);
 	const prevFromIdx = useRef(0);
-	// biome-ignore lint/correctness/useExhaustiveDependencies: legendRef
 	useLayoutEffect(() => {
 		const legend = legendRef.current;
-		if (!legend || !entrySize || !seriesData) {
+		if (!legend || !entrySize || !seriesData || hasPins) {
 			return;
 		}
 
@@ -95,11 +95,19 @@ export function useVirtualization(
 
 		const timeoutId = setTimeout(() => (ignoreScroll.current = false), 100);
 		return () => clearTimeout(timeoutId);
-	}, [setVisibleFrom, seriesData, entrySize, direction, gap]);
+	}, [
+		legendRef,
+		setVisibleFrom,
+		seriesData,
+		entrySize,
+		direction,
+		gap,
+		hasPins,
+	]);
 
 	return {
 		onScroll({ currentTarget }: UIEvent) {
-			if (ignoreScroll.current || !entrySize) {
+			if (ignoreScroll.current || !entrySize || hasPins) {
 				return;
 			}
 			const index = calculateIdx(currentTarget, {
@@ -112,7 +120,7 @@ export function useVirtualization(
 		},
 		onEntryFocus(i: number) {
 			const legend = legendRef.current;
-			if (!legend || !entrySize) {
+			if (!legend || !entrySize || hasPins) {
 				return;
 			}
 			const scrollArgs = { entrySize, direction, gap };

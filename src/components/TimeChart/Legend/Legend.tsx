@@ -11,23 +11,13 @@ import { useVirtualization } from "./useVirtualization";
 const cx = classNames.bind(styles);
 
 export function Legend<S extends TimeSeries>({
-	entries,
-	...props
-}: LegendProps<S> & { entries?: readonly S[] }) {
-	if (!entries) {
-		return <VirtualizedLegend {...props} />;
-	}
-	return <NonVirtualizedLegend {...props} entries={entries} />;
-}
-
-function VirtualizedLegend<S extends TimeSeries>({
 	Entry,
 	vertical,
 	entriesGap,
 	className,
 }: LegendProps<S>) {
 	const direction = vertical ? "vertical" : "horizontal";
-	const { renderReady, seriesData, colors } = useChart<S>();
+	const { renderReady, seriesData } = useChart<S>();
 
 	const { onKeyDown, entry } = useInteraction(direction);
 	const layout = useLayout(direction, entriesGap);
@@ -44,21 +34,19 @@ function VirtualizedLegend<S extends TimeSeries>({
 			tabIndex={-1}
 		>
 			{renderReady && seriesData ? (
-				seriesData.map((series, i) => {
+				seriesData.map((series) => {
 					const { ref, onFocus, ...eventHandlers } = entry(series.id);
 					return (
 						<Entry
 							key={series.id}
 							series={series}
-							seriesIndex={i}
-							seriesColor={colors[i % colors.length]!}
 							ref={(e) => {
 								entryRef(e);
 								ref(e);
 							}}
 							onFocus={() => {
 								onFocus();
-								onEntryFocus(i);
+								onEntryFocus(series.$index);
 							}}
 							{...eventHandlers}
 						/>
@@ -67,47 +55,6 @@ function VirtualizedLegend<S extends TimeSeries>({
 			) : (
 				<LoadingSpinner size={36} />
 			)}
-		</ol>
-	);
-}
-
-function NonVirtualizedLegend<S extends TimeSeries>({
-	entries,
-	Entry,
-	vertical,
-	entriesGap,
-	className,
-}: LegendProps<S> & { entries: readonly S[] }) {
-	const direction = vertical ? "vertical" : "horizontal";
-	const { colors } = useChart<S>();
-
-	const { onKeyDown, entry } = useInteraction(direction);
-	const { legendStyle, legendRef, entryRef } = useLayout(direction, entriesGap);
-
-	return (
-		<ol
-			style={legendStyle}
-			ref={legendRef}
-			className={cx("legend", direction, className)}
-			onKeyDown={onKeyDown}
-			tabIndex={-1}
-		>
-			{entries.map((series, i) => {
-				const { ref, ...eventHandlers } = entry(series.id);
-				return (
-					<Entry
-						key={series.id}
-						series={series}
-						seriesIndex={i}
-						seriesColor={colors[i % colors.length]!}
-						ref={(e) => {
-							entryRef(e);
-							ref(e);
-						}}
-						{...eventHandlers}
-					/>
-				);
-			})}
 		</ol>
 	);
 }

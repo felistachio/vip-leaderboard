@@ -70,35 +70,46 @@ body:has(.chart-page) {
 			justify-content: center;
 			overflow: hidden;
 
+			ol.legend {
+				padding: var(--box-shadow-size) var(--legend-padding);
+				margin: var(--legend-padding) 0;
+			}
 			.legend {
 				outline: none;
 				--box-shadow-size: 10px;
-				padding: var(--box-shadow-size) var(--legend-padding);
-				margin: var(--legend-padding) 0;
 				overflow-x: hidden;
 
 				.info-box {
 					position: relative;
-					.pin-icon {
+					&.unpinned {
+						border-color: transparent;
+						/* instead of no border to keep size stable */
+					}
+
+					.pin-btn {
 						position: absolute;
 						top: 0;
 						right: 0;
-						transform: rotate(45deg);
 						cursor: pointer;
+						outline: none;
+						border: none;
+						background: none;
 
 						color: var(--text-tertiary);
 						&:hover {
 							color: var(--text-secondary);
 						}
-						&:active {
-							color: var(--text-primary);
-						}
-						&.pinned {
+						&:is(:active, :focus-visible) {
 							color: var(--accent);
 						}
+						&.pinned:not(:hover, :focus-visible) {
+							color: var(--text-primary);
+						}
 					}
-					&:not(:hover) .pin-icon:not(.pinned) {
-						display: none;
+					&:not(:focus, :hover)
+						.pin-btn:not(.pinned, :focus-visible) {
+						/* visibility hidden would make it inaccessible to tab ;*/
+						color: transparent;
 					}
 				}
 			}

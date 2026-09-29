@@ -10,12 +10,12 @@ import type { PointTooltipProps } from "./layers/Points";
 interface ChartContextValue<S extends TimeSeries = TimeSeries>
 	extends State<{
 		activeSeries: Maybe<string>;
-		pinnedIds: Maybe<readonly string[]>;
 		hoveredPoint: Maybe<InteractivePoint>;
 		enableHover: boolean;
 		visibleIdx: Maybe<VisibleIdx>;
 	}> {
-	seriesData: Maybe<readonly S[]>;
+	seriesData: Maybe<ReadonlyArray<S & { $index: number }>>;
+	pins: readonly S["id"][];
 	chartData: Maybe<readonly ChartSeries[]>;
 	renderReady: boolean;
 	since: YyyyMm;
@@ -23,7 +23,8 @@ interface ChartContextValue<S extends TimeSeries = TimeSeries>
 	area: boolean;
 	cumulative: boolean;
 	ranked: boolean;
-	colors: readonly string[];
+	colorsCount: number;
+	colorMap: Record<S["id"], string>;
 	PointTooltip: Maybe<(props: PointTooltipProps<S>) => ReactElement | null>;
 }
 
@@ -35,12 +36,15 @@ export function useChart<S extends TimeSeries = TimeSeries>() {
 		throw new Error("useChart must be used within ChartContext");
 	}
 
-	const { hoveredPoint, activeSeries, ...rest } = context;
+	const { hoveredPoint, activeSeries, pins, ...rest } = context;
 	return {
 		...rest,
 		activeSeries,
 		isHighlighted: (seriesId: string) => activeSeries === seriesId,
 		isMuted: (seriesId: string) => activeSeries && activeSeries !== seriesId,
 		isPointHovered: (point: InteractivePoint) => isEqual(point, hoveredPoint),
+		hasPins: pins.length > 0,
+		isPinned: (seriesId: string) => pins.includes(seriesId),
+		isUnpinned: (seriesId: string) => pins.length && !pins.includes(seriesId),
 	};
 }

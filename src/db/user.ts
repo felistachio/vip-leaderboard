@@ -151,5 +151,7 @@ export function getUserMonthlyCount(
 		};
 	});
 
+	// total here doesn't refer to actual total,
+	// but sum of the specified types (default all types)
 	return users.sort(userSortBy((u) => u.total));
 }
