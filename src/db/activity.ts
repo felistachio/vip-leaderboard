@@ -73,7 +73,7 @@ export interface ActivityMonthlyCount extends TimeSeries {
 	type: ActivityType;
 	count: number;
 }
-export function getActivityMonthlyStats(
+export function getActivityMonthlyCount(
 	db: BaseSQLiteDatabase<"sync", any>,
 	{ since, until, user }: ActivityParams,
 ): ActivityMonthlyCount[] {

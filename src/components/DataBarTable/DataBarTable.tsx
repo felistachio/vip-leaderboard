@@ -15,7 +15,7 @@ import styles from "./DataBarTable.module.css";
 const cx = classNames.bind(styles);
 
 export interface DataRow<Col extends string = string> {
-	data: Record<Col, number>;
+	readonly data: Record<Col, number>;
 }
 
 type Renderer<Row, H extends "with-header" | "no-header"> = {

@@ -13,12 +13,12 @@ import type { PointTooltipProps } from "./layers/Points";
 import { ZoomProvider } from "./ZoomProvider";
 
 export type TimePoint = {
-	month: YyyyMm;
-	value: number;
+	readonly month: YyyyMm;
+	readonly value: number;
 };
 export type TimeSeries = {
-	id: string;
-	data: readonly TimePoint[];
+	readonly id: string;
+	readonly data: readonly TimePoint[];
 };
 export type VisibleIdx = readonly [from: number, to: number];
 
