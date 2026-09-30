@@ -36,7 +36,7 @@ export interface UserStats
 export function getUserStats(
 	{ months, monthCount, monthIndices, users }: Data,
 	{ since, until }: UserStatsParams,
-): readonly UserStats[] {
+): UserStats[] {
 	const sinceIdx = since ? (monthIndices[since] ?? 0) : 0;
 	const untilIdx = until
 		? (monthIndices[until] ?? monthCount - 1)
@@ -80,7 +80,7 @@ export interface UserMonthlyCount extends User, TimeSeries {
 export function getUserMonthlyCount(
 	{ months, monthCount, monthIndices, users }: Data,
 	{ since, until, types = activityTypes }: UserMonthlyCountParams,
-): readonly UserMonthlyCount[] {
+): UserMonthlyCount[] {
 	const sinceIdx = since ? (monthIndices[since] ?? 0) : 0;
 	const untilIdx = until
 		? (monthIndices[until] ?? monthCount - 1)

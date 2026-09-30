@@ -8,7 +8,7 @@
 		"build": "VITE_CONFIG_NATIVE_IGNORE_WARNING=true vite build --configLoader bundle",
 		"preview": "VITE_CONFIG_NATIVE_IGNORE_WARNING=true vite preview --configLoader bundle",
 		"tscheck": "tsc -p tsconfig.server.json ; tsc -p tsconfig.client.json",
-		"db-reload": "rm public/db.sqlite; drizzle-kit push && tsx --tsconfig tsconfig.server.json loader/main.ts",
+		"db-reload": "tsx --tsconfig tsconfig.server.json loader/main.ts",
 		"db-update": "tsx --tsconfig tsconfig.server.json loader/main.ts update"
 	},
 	"dependencies": {
@@ -20,25 +20,19 @@
 		"@tanstack/router-plugin": "^1.168.40",
 		"classnames": "^2.5.1",
 		"d3-shape": "^3.2.0",
-		"drizzle-orm": "^0.45.2",
 		"es-toolkit": "^1.52.0",
 		"react": "^19.3.0",
 		"react-dom": "^19.3.0",
 		"react-flip-toolkit": "^7.2.4",
-		"react-range": "^1.10.0",
-		"sql.js": "^1.14.2"
+		"react-range": "^1.10.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.5.14",
-		"@types/better-sqlite3": "^9.6.0",
 		"@types/d3-shape": "^3.2.0",
 		"@types/node": "^26.6.2",
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
-		"@types/sql.js": "^1.4.11",
 		"@vitejs/plugin-react": "^6.1.1",
-		"better-sqlite3": "^13.0.3",
-		"drizzle-kit": "^0.31.10",
 		"tsx": "^4.23.13",
 		"vite": "^8.3.0"
 	}

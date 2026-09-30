@@ -2,9 +2,9 @@ import { useNavigate } from "@tanstack/react-router";
 import classNames from "classnames/bind";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { TimeChart } from "@/components/TimeChart";
-import { activityLabels } from "@/db/activity";
-import { loadDB } from "@/db/loader";
-import { getUserMonthlyCount, type UserMonthlyCount } from "@/db/user";
+import { loadData } from "@/data";
+import { activityLabels } from "@/data/activity";
+import { getUserMonthlyCount, type UserMonthlyCount } from "@/data/user";
 import { useWindowSize } from "@/hooks/useWindowSize";
 import { Header } from "../Header";
 import { ChartControls, useChartControls } from "./ChartControls";
@@ -20,8 +20,8 @@ export function ChartPage() {
 
 	const [data, setData] = useState<UserMonthlyCount[]>();
 	useEffect(() => {
-		loadDB()
-			.then((db) => getUserMonthlyCount(db, { since, until, types }))
+		loadData()
+			.then((dat) => getUserMonthlyCount(dat, { since, until, types }))
 			.then(setData);
 	}, [since, until, types]);
 

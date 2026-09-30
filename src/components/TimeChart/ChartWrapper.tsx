@@ -149,9 +149,9 @@ export function ChartWrapper<S extends TimeSeries>({
 }
 
 export interface TransformOptions {
-	area?: boolean;
-	ranked?: boolean;
-	cumulative?: boolean;
+	readonly area?: boolean;
+	readonly ranked?: boolean;
+	readonly cumulative?: boolean;
 }
 function useTransform(
 	data: Maybe<readonly TimeSeries[]>,

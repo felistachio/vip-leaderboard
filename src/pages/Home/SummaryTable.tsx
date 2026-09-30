@@ -7,7 +7,7 @@ import {
 	activityColors,
 	activityIcons,
 	activityLabels,
-} from "@/db/activity";
+} from "@/data/activity";
 import { useHomeControls } from "./HomeControls";
 import styles from "./HomePage.module.css";
 

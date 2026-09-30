@@ -1,11 +1,11 @@
 import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
 import { mapValues } from "es-toolkit";
-import { type ActivityType, activityTypes } from "@/db/activity";
-import type { UserStatsParams } from "@/db/user";
+import { type ActivityType, activityTypes } from "@/data/activity";
+import type { UserStatsParams } from "@/data/user";
 import { HomePage } from "@/pages/Home";
 
 export interface RankingOptions extends UserStatsParams {
-	sortBy?: ActivityType | "total";
+	readonly sortBy?: ActivityType | "total";
 }
 
 export const Route = createFileRoute("/")({

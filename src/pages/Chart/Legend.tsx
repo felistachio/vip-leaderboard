@@ -4,7 +4,7 @@ import { Flipper } from "react-flip-toolkit";
 import { Resizer } from "@/components/Resizer";
 import { SearchBar } from "@/components/SearchBar";
 import { TimeChart, useChart } from "@/components/TimeChart";
-import type { UserMonthlyCount } from "@/db/user";
+import type { UserMonthlyCount } from "@/data/user";
 import { useChartControls } from "./ChartControls";
 import styles from "./ChartPage.module.css";
 import { LegendEntry } from "./LegendEntry";

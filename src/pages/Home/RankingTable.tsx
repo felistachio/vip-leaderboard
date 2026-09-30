@@ -1,8 +1,8 @@
 import classNames from "classnames/bind";
 import { DataBarTable } from "@/components/DataBarTable";
 import { UserHeader } from "@/components/UserHeader";
-import { activityColors } from "@/db/activity";
-import type { UserStats } from "@/db/user";
+import { activityColors } from "@/data/activity";
+import type { UserStats } from "@/data/user";
 import { useWindowSize } from "@/hooks/useWindowSize";
 import { useHomeControls } from "./HomeControls";
 import styles from "./HomePage.module.css";

@@ -1,14 +1,9 @@
-import {
-	DEFAULT_ACTIVITY_STATS,
-	DEFAULT_TIME_RANGE,
-	DEFAULT_USER_STATS,
-} from "virtual:db";
 import classNames from "classnames/bind";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { getActivityStats } from "@/db/activity";
-import { loadDB } from "@/db/loader";
-import { getUserStats, type UserStats, userSortBy } from "@/db/user";
+import { loadData } from "@/data";
+import { type ActivityStats, getActivityStats } from "@/data/activity";
+import { getUserStats, type UserStats, userSortBy } from "@/data/user";
 import { useDelay } from "@/hooks/useDelay";
 import { yyyyMmOffset } from "@/utils/time";
 import { Header } from "../Header";
@@ -21,27 +16,22 @@ const cx = classNames.bind(styles);
 
 export function HomePage() {
 	const [{ until, since, sortBy }] = useHomeControls();
-	const isDefaultRange =
-		since === DEFAULT_TIME_RANGE.since && until === DEFAULT_TIME_RANGE.until;
 
-	const [activityStats, setActivityStats] = useState(
-		isDefaultRange ? DEFAULT_ACTIVITY_STATS : undefined,
-	);
+	const [activityStats, setActivityStats] =
+		useState<readonly ActivityStats[]>();
 	useEffect(() => {
-		loadDB()
+		loadData()
 			.then((db) => getActivityStats(db, { since, until }))
 			.then(setActivityStats);
 	}, [since, until]);
 
-	const [users, setUsers] = useState(
-		isDefaultRange ? DEFAULT_USER_STATS : undefined,
-	);
+	const [users, setUsers] = useState<readonly UserStats[]>();
 	const [usersLastMonth, setUsersLastMonth] = useState<UserStats[]>();
 	useEffect(() => {
-		loadDB().then((db) => {
-			setUsers(getUserStats(db, { since, until }));
+		loadData().then((dat) => {
+			setUsers(getUserStats(dat, { since, until }));
 			setUsersLastMonth(
-				getUserStats(db, {
+				getUserStats(dat, {
 					since: yyyyMmOffset(since, { months: -1 }),
 					until: yyyyMmOffset(until, { months: -1 }),
 				}),

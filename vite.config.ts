@@ -1,13 +1,11 @@
-import { copyFileSync } from "node:fs";
+import { copyFileSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import react from "@vitejs/plugin-react";
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
 import { defineConfig, type Plugin } from "vite";
-import { getActivityStats } from "./src/db/activity";
-import { getFirstMonth, getLastMonth } from "./src/db/time";
-import { getUser, getUserStats } from "./src/db/user";
+import { getActivityStats } from "./src/data/activity";
+import { Data } from "./src/data/types";
+import { getUser, getUserStats } from "./src/data/user";
 import { monthsInRange, yyyyMmOffset } from "./src/utils/time";
 
 const SQL_WASM = {
@@ -45,17 +43,15 @@ function dbBundler(): Plugin {
 				return;
 			}
 
-			const db = drizzle(new Database(res("public/db.sqlite")));
+			const data: Data = JSON.parse(
+				readFileSync(res("public/data.json"), "utf-8"),
+			);
 
-			const firstMonth = getFirstMonth(db);
-			const lastMonth = getLastMonth(db);
+			const [firstMonth, lastMonth] = data.monthRange;
 			const allMonths = monthsInRange(firstMonth, lastMonth);
 			const twoYearsAgo = yyyyMmOffset(lastMonth, { years: -2, months: 1 });
 			const defaultTimeRange = { since: twoYearsAgo, until: lastMonth };
-
-			const defaultActivityStats = getActivityStats(db, defaultTimeRange);
-			const defaultUserStats = getUserStats(db, defaultTimeRange);
-			const zack = getUser(db, "zackwb");
+			const zack = getUser(data, "zackwb");
 
 			return `
 					export const FIRST_MONTH = ${JSON.stringify(firstMonth)}
@@ -63,9 +59,6 @@ function dbBundler(): Plugin {
 					export const ALL_MONTHS = ${JSON.stringify(allMonths)}
 					export const TWO_YEARS_AGO = ${JSON.stringify(twoYearsAgo)}
 					export const DEFAULT_TIME_RANGE = ${JSON.stringify(defaultTimeRange)}
-
-					export const DEFAULT_ACTIVITY_STATS = ${JSON.stringify(defaultActivityStats)}
-					export const DEFAULT_USER_STATS = ${JSON.stringify(defaultUserStats)}
 					export const ZACK = ${JSON.stringify(zack)}
 				`;
 		},

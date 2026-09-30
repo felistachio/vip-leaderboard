@@ -1,12 +1,12 @@
 import { createFileRoute, retainSearchParams } from "@tanstack/react-router";
 import { mapValues } from "es-toolkit";
 import type { TransformOptions } from "@/components/TimeChart";
-import { activityTypes } from "@/db/activity";
-import type { UserMonthlyCountParams } from "@/db/user";
+import { activityTypes } from "@/data/activity";
+import type { UserMonthlyCountParams } from "@/data/user";
 import { ChartPage } from "@/pages/Chart";
 
 export interface ChartOptions extends UserMonthlyCountParams, TransformOptions {
-	pins?: readonly string[];
+	readonly pins?: readonly string[];
 }
 
 export const Route = createFileRoute("/chart")({

@@ -3,7 +3,7 @@ import { useMemo, useRef } from "react";
 import { Flipped } from "react-flip-toolkit";
 import { type LegendEntryProps, useChart } from "@/components/TimeChart";
 import { UserHeader } from "@/components/UserHeader";
-import type { UserMonthlyCount } from "@/db/user";
+import type { UserMonthlyCount } from "@/data/user";
 import { useChartControls } from "./ChartControls";
 import styles from "./ChartPage.module.css";
 

@@ -6,7 +6,7 @@ import { Button } from "@/components/Button";
 import { PopupMenu } from "@/components/PopupMenu";
 import { RangeSlider } from "@/components/RangeSlider";
 import { useChartZoom } from "@/components/TimeChart";
-import { activityIcons, activityLabels, activityTypes } from "@/db/activity";
+import { activityIcons, activityLabels, activityTypes } from "@/data/activity";
 import { type ChartOptions, Route } from "@/routes/chart";
 import { keys, pick } from "@/utils/object";
 import type { YyyyMm } from "@/utils/time";
@@ -121,7 +121,7 @@ const defaultOptions = {
 	area: false,
 	ranked: false,
 	types: [],
-	pins: [], 
+	pins: [],
 } satisfies Required<ChartOptions>;
 
 const isDefaultOptions = (options: ChartOptions) =>

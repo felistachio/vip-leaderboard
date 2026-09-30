@@ -1,6 +1,6 @@
 import classNames from "classnames/bind";
 import { useState } from "react";
-import type { User } from "@/db/user";
+import type { User } from "@/data/types";
 import styles from "./UserHeader.module.css";
 
 const cx = classNames.bind(styles);

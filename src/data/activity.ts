@@ -38,7 +38,7 @@ export interface ActivityStats extends DataRow<"count"> {
 export function getActivityStats(
 	{ monthCount, monthIndices, users }: Data,
 	{ since, until, user }: ActivityParams,
-): readonly ActivityStats[] {
+): ActivityStats[] {
 	const sinceIdx = since ? (monthIndices[since] ?? 0) : 0;
 	const untilIdx = until
 		? (monthIndices[until] ?? monthCount - 1)
@@ -78,7 +78,7 @@ export interface ActivityMonthlyCount extends TimeSeries {
 export function getActivityMonthlyCount(
 	data: Data,
 	{ since, until, user }: ActivityParams,
-): readonly ActivityMonthlyCount[] {
+): ActivityMonthlyCount[] {
 	// will be used for per-user chart
 	return "TODO" as any;
 }

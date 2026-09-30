@@ -1,7 +1,7 @@
 import classNames from "classnames/bind";
 import type { PointTooltipProps } from "@/components/TimeChart";
 import { UserHeader } from "@/components/UserHeader";
-import type { UserMonthlyCount } from "@/db/user";
+import type { UserMonthlyCount } from "@/data/user";
 import styles from "./ChartPage.module.css";
 
 const cx = classNames.bind(styles);
