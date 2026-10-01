@@ -42,7 +42,7 @@ export function ChartControls() {
 					selected={[since, until]}
 					onChange={onDateChange}
 					minDistance={area ? 1 : 0}
-					debounce={66}
+					debounce={100}
 				/>
 				<PopupMenu>
 					<PopupMenu.Trigger>
