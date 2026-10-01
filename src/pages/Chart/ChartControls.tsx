@@ -42,9 +42,8 @@ export function ChartControls() {
 					selected={[since, until]}
 					onChange={onDateChange}
 					minDistance={area ? 1 : 0}
-					debounce={150}
+					debounce={66}
 				/>
-
 				<PopupMenu>
 					<PopupMenu.Trigger>
 						{(props) => <Button {...props}>Options</Button>}

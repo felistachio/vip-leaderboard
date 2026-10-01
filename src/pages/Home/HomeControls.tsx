@@ -47,7 +47,7 @@ export function HomeControls() {
 					domain={ALL_MONTHS}
 					selected={[since, until]}
 					onChange={onDateChange}
-					debounce={100}
+					debounce={33}
 				/>
 				<PopupMenu menuId={controlMenuId}>
 					<PopupMenu.Trigger>
