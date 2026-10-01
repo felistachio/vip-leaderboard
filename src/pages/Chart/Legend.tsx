@@ -45,6 +45,7 @@ export function Legend() {
 		);
 	}, [seriesData]);
 
+	const flipKey = useMemo(() => seriesData?.map((s) => s.id), [seriesData]);
 	return (
 		<>
 			<fieldset
@@ -76,7 +77,7 @@ export function Legend() {
 						className={cx("search-bar")}
 					/>
 				)}
-				<Flipper flipKey={pins.join()} className={cx("legend-container")}>
+				<Flipper flipKey={flipKey} className={cx("legend-container")}>
 					<TimeChart.Legend
 						vertical
 						Entry={LegendEntry}
