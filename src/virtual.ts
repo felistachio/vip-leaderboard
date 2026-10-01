@@ -1,4 +1,4 @@
-declare module "virtual:db" {
+declare module "virtual:data" {
 	import type { User } from "@/data/types";
 	import type { UserStatsParams } from "@/data/user";
 	import type { YyyyMm } from "@/utils/time";

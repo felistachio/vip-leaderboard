@@ -1,6 +1,13 @@
 export const windowed3 = <T>(arr: readonly T[]) =>
 	arr.map((elt, i) => [arr[i - 1], elt, arr[i + 1]] as const);
 
+export function reduce<T extends TNext, TNext>(
+	array: readonly T[],
+	reducer: (prev: TNext, curr: T) => TNext,
+): TNext {
+	return array.reduce(reducer as any);
+}
+
 export function mapReduce<T, TPrev, TNext extends TPrev>(
 	array: readonly T[],
 	reducer: (prev: TPrev, curr: T) => TNext,
@@ -19,20 +26,20 @@ export function mapReduce<T, TPrev, TNext extends TPrev>(
 }
 
 type Map<
-	arr extends readonly unknown[],
-	f extends (elt: arr[number]) => unknown,
+	Arr extends readonly unknown[],
+	F extends (elt: Arr[number]) => unknown,
 	__acc extends unknown[] = [],
-> = f extends (elt: any) => infer U
-	? number extends arr["length"]
+> = F extends (elt: any) => infer U
+	? number extends Arr["length"]
 		? U[]
-		: arr extends readonly [infer _, ...infer Rest]
-			? Map<Rest, f, [...__acc, U]>
+		: Arr extends readonly [infer _, ...infer Rest]
+			? Map<Rest, F, [...__acc, U]>
 			: __acc
 	: never;
 
-export function map<const arr extends readonly unknown[], out>(
-	arr: arr,
-	f: (elt: arr[number]) => out,
+export function map<const Arr extends readonly unknown[], Out>(
+	Arr: Arr,
+	f: (elt: Arr[number]) => Out,
 ) {
-	return arr.map(f) as Map<arr, typeof f>;
+	return Arr.map(f) as Map<Arr, typeof f>;
 }

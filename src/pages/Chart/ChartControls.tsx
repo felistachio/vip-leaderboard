@@ -1,4 +1,4 @@
-import { ALL_MONTHS, DEFAULT_TIME_RANGE } from "virtual:db";
+import { ALL_MONTHS, DEFAULT_TIME_RANGE } from "virtual:data";
 import classNames from "classnames/bind";
 import { isEqual, mapValues } from "es-toolkit";
 import { useCallback, useEffect, useMemo } from "react";

@@ -1,7 +1,8 @@
+import { zip } from "es-toolkit";
 import type { DataRow } from "@/components/DataBarTable";
 import type { TimeSeries } from "@/components/TimeChart";
-import { entries } from "@/utils/object";
-import type { YyyyMm } from "@/utils/time";
+import { entries } from "../utils/object";
+import type { YyyyMm } from "../utils/time";
 import type { Data } from "./types";
 
 export const activityTypes = ["report", "warning", "ban"] as const;
@@ -53,15 +54,14 @@ export function getActivityStats(
 		) {
 			continue;
 		}
-		counts.forEach(([r, w, b], k) => {
-			const i = activeMonths[k]!;
+		for (const [i, [r, w, b]] of zip(activeMonths, counts)) {
 			if (sinceIdx <= i && i <= untilIdx) {
 				typeCounts.report += r;
 				typeCounts.warning += w;
 				typeCounts.ban += b;
 				typeCounts.total += r + w + b;
 			}
-		});
+		}
 	}
 
 	return entries(typeCounts).map(([type, count]) => ({

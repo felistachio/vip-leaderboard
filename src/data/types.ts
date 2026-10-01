@@ -7,18 +7,17 @@ export type User = {
 	readonly color: string;
 };
 
-export type UserCounts = {
+type ActivityCount = readonly [report: number, warning: number, ban: number];
+export type UserActivities = {
 	/** Month indices, sorted. Guaranteed not empty. */
 	readonly activeMonths: readonly number[];
 	/** Aligned with `activeMonths` */
-	readonly counts: ReadonlyArray<
-		readonly [report: number, warning: number, ban: number]
-	>;
+	readonly counts: readonly ActivityCount[];
 };
 
 export type StoredData = {
 	readonly monthRange: readonly [first: YyyyMm, last: YyyyMm];
-	readonly users: readonly (User & UserCounts)[];
+	readonly users: readonly (User & UserActivities)[];
 };
 
 export interface Data extends StoredData {

@@ -1,4 +1,4 @@
-import { FIRST_MONTH, LAST_MONTH, TWO_YEARS_AGO } from "virtual:db";
+import { FIRST_MONTH, LAST_MONTH, TWO_YEARS_AGO } from "virtual:data";
 import classNames from "classnames/bind";
 import { useMemo } from "react";
 import { DataBarTable } from "@/components/DataBarTable";

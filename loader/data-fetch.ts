@@ -4,7 +4,7 @@ import type { Channel } from "./types";
 
 const dataDir = "message-history/data";
 
-export const fetchCurrentData = () =>
+export const readCurrentData = () =>
 	Promise.all(
 		ls(dataDir).map((file) => readJson<Channel>(`${dataDir}/${file}`)),
 	);

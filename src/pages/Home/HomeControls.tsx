@@ -3,7 +3,7 @@ import {
 	DEFAULT_TIME_RANGE,
 	FIRST_MONTH,
 	LAST_MONTH,
-} from "virtual:db";
+} from "virtual:data";
 import classNames from "classnames/bind";
 import { isEqual, mapValues } from "es-toolkit";
 import { useCallback, useId, useMemo, useState } from "react";

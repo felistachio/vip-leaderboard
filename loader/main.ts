@@ -1,7 +1,9 @@
-import { fetchCurrentData, fetchUpdates } from "./data-fetch";
-import { saveToDB } from "./data-save";
+import { fetchUpdates, readCurrentData } from "./data-fetch";
+import { appendData, saveData } from "./data-save";
 import { countActivities } from "./scoring";
 
-(process.argv[2] === "update" ? fetchUpdates : fetchCurrentData)()
+const isUpdate = process.argv[2] === "update";
+
+(isUpdate ? fetchUpdates : readCurrentData)()
 	.then(countActivities)
-	.then(saveToDB);
+	.then(isUpdate ? appendData : saveData);

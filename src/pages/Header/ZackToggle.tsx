@@ -1,4 +1,4 @@
-import { ZACK } from "virtual:db";
+import { ZACK } from "virtual:data";
 import { useRef } from "react";
 import { Toggle } from "@/components/Toggle";
 import { setIsZack, useIsZack } from "@/hooks/useIsZack";

@@ -1,15 +1,11 @@
+import { zip } from "es-toolkit";
 import type { DataRow } from "@/components/DataBarTable";
 import type { TimeSeries } from "@/components/TimeChart";
 import type { TimePoint } from "@/components/TimeChart/ChartWrapper";
 import { map } from "@/utils/array";
 import type { YyyyMm } from "@/utils/time";
-import type { Maybe } from "@/utils/types";
 import { type ActivityType, activityTypes } from "./activity";
 import type { Data, User } from "./types";
-
-export function getUser({ users }: Data, userId: string): Maybe<User> {
-	return users.find(({ id }) => id === userId);
-}
 
 interface UserActivity {
 	firstActiveMonth: YyyyMm;
@@ -51,15 +47,14 @@ export function getUserStats(
 			continue;
 		}
 		const data = { report: 0, warning: 0, ban: 0, total: 0 };
-		counts.forEach(([r, w, b], k) => {
-			const i = activeMonths[k]!;
+		for (const [i, [r, w, b]] of zip(activeMonths, counts)) {
 			if (sinceIdx <= i && i <= untilIdx) {
 				data.report += r;
 				data.warning += w;
 				data.ban += b;
 				data.total += r + w + b;
 			}
-		});
+		}
 		if (data.total) {
 			const firstActiveMonth = months[activeMonths[0]!]!;
 			const lastActiveMonth = months[activeMonths[activeMonths.length - 1]!]!;
@@ -85,7 +80,9 @@ export function getUserMonthlyCount(
 	const untilIdx = until
 		? (monthIndices[until] ?? monthCount - 1)
 		: monthCount - 1;
-	const weights = map(activityTypes, (t) => (types.includes(t) ? 1 : 0));
+	const activityWeights = map(activityTypes, (t) =>
+		!types.length || types.includes(t) ? 1 : 0,
+	);
 
 	const userMonthlyCounts: (UserMonthlyCount & UserActivity)[] = [];
 	for (const { activeMonths, counts, ...userInfo } of users) {
@@ -98,14 +95,14 @@ export function getUserMonthlyCount(
 
 		let total = 0;
 		const data: TimePoint[] = [];
-		for (let k = 0; k < counts.length; k++) {
-			const i = activeMonths[k]!;
-			if (i < sinceIdx || i > untilIdx) {
+		for (const [i, activityCounts] of zip(activeMonths, counts)) {
+			if (i > untilIdx || i < sinceIdx) {
 				continue;
 			}
-			const count = counts[k]!;
 			const value =
-				count[0] * weights[0] + count[1] * weights[1] + count[2] * weights[2];
+				activityCounts[0] * activityWeights[0] +
+				activityCounts[1] * activityWeights[1] +
+				activityCounts[2] * activityWeights[2];
 			if (value) {
 				total += value;
 				data.push({ month: months[i]!, value });

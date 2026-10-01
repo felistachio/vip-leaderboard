@@ -1,4 +1,4 @@
-import { LAST_MONTH } from "virtual:db";
+import { LAST_MONTH } from "virtual:data";
 import { Link } from "@tanstack/react-router";
 import classNames from "classnames/bind";
 import { type CSSProperties, type RefObject, useEffect, useState } from "react";
