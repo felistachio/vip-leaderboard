@@ -1,6 +1,5 @@
 import { type KeyboardEvent, useEffect, useRef } from "react";
 import { useDrag } from "@/hooks/useDrag";
-import type { Maybe } from "@/utils/types";
 import { useChart } from "../chartContext";
 import type { Direction } from "./types";
 
@@ -8,11 +7,10 @@ export function useInteraction(direction: Direction) {
 	const { isDragging } = useDrag();
 	const { activeSeries, setActiveSeries, isUnpinned } = useChart();
 
-	const lastHoveredSeries = useRef<Maybe<string>>(undefined);
 	const entriesRef = useRef<Record<string, HTMLLIElement>>({});
-
 	useEffect(() => {
 		if (activeSeries) {
+			// mostly for the search bar (focus on successful search)
 			entriesRef.current[activeSeries]?.focus();
 		}
 	}, [activeSeries]);
@@ -35,13 +33,9 @@ export function useInteraction(direction: Direction) {
 				}
 			},
 			onMouseEnter() {
-				if (
-					!isDragging &&
-					(!activeSeries || lastHoveredSeries.current !== seriesId) &&
-					!isUnpinned(seriesId)
-				) {
-					lastHoveredSeries.current = seriesId;
+				if (!isDragging && !isUnpinned(seriesId)) {
 					setActiveSeries(seriesId);
+					entriesRef.current[seriesId]?.focus();
 				}
 			},
 			onMouseLeave() {
